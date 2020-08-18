@@ -3,6 +3,13 @@ name = "maze_generator"
 version = "0.1.0"
 authors = ["Finn-Thorben Sell <dev@finn-thorben.me>"]
 edition = "2018"
+description = "A library of different maze generation algorithms."
+#documentation = ""
+readme = "README.md"
+repository = "https://github.com/ftsell/maze_generator.git"
+license = "MIT"
+keywords = ["maze", "generator"]
+categories = ["algorithms", "game-development"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

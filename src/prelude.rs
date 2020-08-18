@@ -1,5 +1,5 @@
-use rand::Rng;
 use rand::prelude::*;
+use rand::Rng;
 
 pub enum Direction {
     North,
@@ -19,8 +19,15 @@ impl Direction {
     }
 
     pub fn gen_random_order<T>(rng: &mut T) -> [Direction; 4]
-        where T: Rng {
-        let mut directions = [Direction::North, Direction::East, Direction::South, Direction::West];
+    where
+        T: Rng,
+    {
+        let mut directions = [
+            Direction::North,
+            Direction::East,
+            Direction::South,
+            Direction::West,
+        ];
         directions.shuffle(rng);
         directions
     }
@@ -29,7 +36,9 @@ impl Direction {
 pub type Coordinates = (i32, i32);
 
 pub trait Grid
-    where Self::FieldType: Field {
+where
+    Self::FieldType: Field,
+{
     type FieldType;
 
     fn get_size(&self) -> &(i32, i32);
@@ -41,8 +50,10 @@ pub trait Grid
     fn get_field(&self, coordinates: Coordinates) -> Result<&Self::FieldType, ()>;
 
     fn are_coordinates_inside(&self, coordinates: Coordinates) -> bool {
-        coordinates.0 >= 0 && coordinates.0 < self.get_size().0
-            && coordinates.1 >= 0 && coordinates.1 < self.get_size().1
+        coordinates.0 >= 0
+            && coordinates.0 < self.get_size().0
+            && coordinates.1 >= 0
+            && coordinates.1 < self.get_size().1
     }
 }
 
@@ -50,12 +61,19 @@ pub trait Grid
 macro_rules! impl_grid_debug {
     ($t:ty) => {
         impl std::fmt::Debug for $t {
-            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::result::Result<(), std::fmt::Error> {
+            fn fmt(
+                &self,
+                f: &mut core::fmt::Formatter<'_>,
+            ) -> core::result::Result<(), std::fmt::Error> {
                 for iy in 0..self.get_size().1 {
                     // print top passage
                     for ix in 0..self.get_size().0 {
                         f.write_str("·")?;
-                        if self.get_field((ix, iy)).unwrap().has_passage(&Direction::North) {
+                        if self
+                            .get_field((ix, iy))
+                            .unwrap()
+                            .has_passage(&Direction::North)
+                        {
                             f.write_str(" ")?;
                         } else {
                             f.write_str("-")?;
@@ -106,7 +124,9 @@ pub trait Field {
 }
 
 pub trait Generator
-    where Self::GridType: Grid {
+where
+    Self::GridType: Grid,
+{
     type GridType;
 
     fn generate(&mut self, width: i32, height: i32) -> Self::GridType;

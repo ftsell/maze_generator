@@ -72,7 +72,10 @@ impl RbGrid {
             let i = self.coords2index(coordinates) as usize;
             let _ = mem::replace(&mut self.data[i], field);
         } else {
-            panic!(format!("Cannot set field at {:?} because it is outside grid.", coordinates));
+            panic!(format!(
+                "Cannot set field at {:?} because it is outside grid.",
+                coordinates
+            ));
         }
     }
 
@@ -104,7 +107,10 @@ impl Grid for RbGrid {
 
     fn get_field(&self, coordinates: Coordinates) -> Result<&Self::FieldType, ()> {
         if self.are_coordinates_inside(coordinates) {
-            Ok(self.data.get(self.coords2index(coordinates) as usize).unwrap())
+            Ok(self
+                .data
+                .get(self.coords2index(coordinates) as usize)
+                .unwrap())
         } else {
             Err(())
         }
@@ -112,7 +118,6 @@ impl Grid for RbGrid {
 }
 
 impl_grid_debug!(RbGrid);
-
 
 // ----------------------------------------
 // Generator
@@ -134,16 +139,18 @@ impl RbGenerator {
 
     fn carve_passages_from(&mut self, coordinates: Coordinates, grid: &mut RbGrid) {
         for i_dir in Direction::gen_random_order(&mut self.rng).iter() {
-            let next_x = coordinates.0 + match i_dir {
-                Direction::East => 1,
-                Direction::West => -1,
-                _ => 0,
-            };
-            let next_y = coordinates.1 + match i_dir {
-                Direction::North => -1,
-                Direction::South => 1,
-                _ => 0,
-            };
+            let next_x = coordinates.0
+                + match i_dir {
+                    Direction::East => 1,
+                    Direction::West => -1,
+                    _ => 0,
+                };
+            let next_y = coordinates.1
+                + match i_dir {
+                    Direction::North => -1,
+                    Direction::South => 1,
+                    _ => 0,
+                };
 
             match grid.get_field((next_x, next_y)) {
                 Ok(next_field) => {
