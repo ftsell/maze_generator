@@ -34,7 +34,7 @@ impl RbGenerator {
                     _ => 0,
                 };
 
-            match grid.get_field((next_x, next_y)) {
+            match grid.get_field(&(next_x, next_y)) {
                 Ok(next_field) => {
                     if next_field.is_untouched() {
                         // set passage on next field
@@ -43,7 +43,7 @@ impl RbGenerator {
                         grid.set_field((next_x, next_y), new_field);
 
                         // set passage on original field
-                        new_field = (*grid.get_field(coordinates).unwrap()).clone();
+                        new_field = (*grid.get_field(&coordinates).unwrap()).clone();
                         new_field.add_passage(i_dir);
                         grid.set_field(coordinates, new_field);
 

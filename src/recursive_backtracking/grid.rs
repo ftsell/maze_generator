@@ -12,8 +12,8 @@ pub struct RbGrid {
 
 impl RbGrid {
     pub(super) fn set_field(&mut self, coordinates: Coordinates, field: RbField) {
-        if self.are_coordinates_inside(coordinates) {
-            let i = self.coords2index(coordinates) as usize;
+        if self.are_coordinates_inside(&coordinates) {
+            let i = self.coords2index(&coordinates) as usize;
             let _ = mem::replace(&mut self.data[i], field);
         } else {
             panic!(format!(
@@ -29,7 +29,7 @@ impl RbGrid {
         (x, y)
     }
 
-    fn coords2index(&self, coords: Coordinates) -> i32 {
+    fn coords2index(&self, coords: &Coordinates) -> i32 {
         (coords.1 * self.get_size().0) + coords.0
     }
 }
@@ -49,7 +49,7 @@ impl Grid for RbGrid {
         &self.goal
     }
 
-    fn get_field(&self, coordinates: Coordinates) -> Result<&Self::FieldType, ()> {
+    fn get_field(&self, coordinates: &Coordinates) -> Result<&Self::FieldType, ()> {
         if self.are_coordinates_inside(coordinates) {
             Ok(self
                 .data

@@ -100,9 +100,9 @@ where
 
     fn get_goal(&self) -> &Coordinates;
 
-    fn get_field(&self, coordinates: Coordinates) -> Result<&Self::FieldType, ()>;
+    fn get_field(&self, coordinates: &Coordinates) -> Result<&Self::FieldType, ()>;
 
-    fn are_coordinates_inside(&self, coordinates: Coordinates) -> bool {
+    fn are_coordinates_inside(&self, coordinates: &Coordinates) -> bool {
         coordinates.0 >= 0
             && coordinates.0 < self.get_size().0
             && coordinates.1 >= 0
@@ -120,7 +120,7 @@ macro_rules! impl_grid_debug {
                     for ix in 0..self.get_size().0 {
                         f.write_str("·")?;
                         if self
-                            .get_field((ix, iy))
+                            .get_field(&(ix, iy))
                             .unwrap()
                             .has_passage(&Direction::North)
                         {
@@ -133,7 +133,7 @@ macro_rules! impl_grid_debug {
 
                     // print left passage and room icon
                     for ix in 0..self.get_size().0 {
-                        let field = self.get_field((ix, iy)).unwrap();
+                        let field = self.get_field(&(ix, iy)).unwrap();
                         if field.has_passage(&Direction::West) {
                             f.write_str(" ")?;
                         } else {
