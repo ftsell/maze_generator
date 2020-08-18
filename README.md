@@ -4,25 +4,28 @@
   <p align="center">
     A library of different maze generation algorithms.
     <br />
-    <a href="https://github.com/roshanlam/ReadMeTemplate/"><strong>Explore the docs »</strong></a>
+    <a href="https://docs.rs/maze_generator/"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/roshanlam/ReadMeTemplate/">View Demo</a>
+    <a href="https://github.com/ftsell/maze_generator/issues">Report Bug</a>
     ·
-    <a href="https://github.com/roshanlam/ReadMeTemplate/issues">Report Bug</a>
+    <a href="https://github.com/ftsell/maze_generator/issues">Request Feature</a>
     ·
-    <a href="https://github.com/roshanlam/ReadMeTemplate/issues">Request Feature</a>
-    ·
-    <a href="https://github.com/roshanlam/ReadMeTemplate/pulls">Send a Pull Request</a>
+    <a href="https://github.com/ftsell/maze_generator/pulls">Send a Pull Request</a>
   </p>
 </p>
 
-## About the Project
 
+## About the Project
+This is a collection of different maze generation algorithms.
+The project's main goal is to provide an easy-to-use API to different algorithms with different characteristics.  
+
+<!-- TODO: add usage in crate doc examples and reference here
 ## Usage
+-->
 
 ## Roadmap
-See the [open issues](https://github.com/roshanlam/ReadMeTemplate/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/ftsell/maze_generator/issues) for a list of proposed features (and known issues).
 
 ## Contributing
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **extremely appreciated**.
