@@ -20,9 +20,8 @@
 This is a collection of different maze generation algorithms.
 The project's main goal is to provide an easy-to-use API to different algorithms with different characteristics.  
 
-<!-- TODO: add usage in crate doc examples and reference here
 ## Usage
--->
+See the [crate documentation](https://docs.rs/maze_generator/) for examples.
 
 ## Roadmap
 See the [open issues](https://github.com/ftsell/maze_generator/issues) for a list of proposed features (and known issues).
