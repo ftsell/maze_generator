@@ -49,7 +49,7 @@ macro_rules! impl_field_debug {
     ($t:ty) => {
         impl std::fmt::Debug for $t {
             fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-                f.debug_struct("$t")
+                f.debug_struct(stringify!($t))
                     .field(
                         "north",
                         &if self.has_wall(&Direction::North) {
