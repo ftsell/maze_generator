@@ -114,7 +114,7 @@ where
 macro_rules! impl_grid_debug {
     ($t:ty) => {
         impl std::fmt::Debug for $t {
-            fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
                 for iy in 0..self.get_size().1 {
                     // print top passage
                     for ix in 0..self.get_size().0 {
