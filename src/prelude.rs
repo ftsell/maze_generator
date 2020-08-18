@@ -1,6 +1,7 @@
 use rand::prelude::*;
 use rand::Rng;
 
+#[derive(Debug, Copy, Clone)]
 pub enum Direction {
     North,
     East,
@@ -35,6 +36,58 @@ impl Direction {
 
 pub type Coordinates = (i32, i32);
 
+pub trait Field {
+    fn has_wall(&self, direction: &Direction) -> bool;
+
+    fn has_passage(&self, direction: &Direction) -> bool {
+        !self.has_wall(direction)
+    }
+}
+
+#[macro_export]
+macro_rules! impl_field_debug {
+    ($t:ty) => {
+        impl std::fmt::Debug for $t {
+            fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+                f.debug_struct("$t")
+                    .field(
+                        "north",
+                        &if self.has_wall(&Direction::North) {
+                            String::from("wall")
+                        } else {
+                            String::from("passage")
+                        },
+                    )
+                    .field(
+                        "east",
+                        &if self.has_wall(&Direction::East) {
+                            String::from("wall")
+                        } else {
+                            String::from("passage")
+                        },
+                    )
+                    .field(
+                        "south",
+                        &if self.has_wall(&Direction::South) {
+                            String::from("wall")
+                        } else {
+                            String::from("passage")
+                        },
+                    )
+                    .field(
+                        "west",
+                        &if self.has_wall(&Direction::West) {
+                            String::from("wall")
+                        } else {
+                            String::from("passage")
+                        },
+                    )
+                    .finish()
+            }
+        }
+    };
+}
+
 pub trait Grid
 where
     Self::FieldType: Field,
@@ -61,10 +114,7 @@ where
 macro_rules! impl_grid_debug {
     ($t:ty) => {
         impl std::fmt::Debug for $t {
-            fn fmt(
-                &self,
-                f: &mut core::fmt::Formatter<'_>,
-            ) -> core::result::Result<(), std::fmt::Error> {
+            fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
                 for iy in 0..self.get_size().1 {
                     // print top passage
                     for ix in 0..self.get_size().0 {
@@ -109,18 +159,10 @@ macro_rules! impl_grid_debug {
                     }
                 }
 
-                core::result::Result::Ok(())
+                Ok(())
             }
         }
     };
-}
-
-pub trait Field {
-    fn has_wall(&self, direction: &Direction) -> bool;
-
-    fn has_passage(&self, direction: &Direction) -> bool {
-        !self.has_wall(direction)
-    }
 }
 
 pub trait Generator

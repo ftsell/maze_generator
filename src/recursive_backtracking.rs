@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use bitflags::_core::fmt::Formatter;
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
 use std::mem;
@@ -28,7 +29,7 @@ impl From<&Direction> for PassageFlags {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct RbField {
     passages: PassageFlags,
 }
@@ -53,6 +54,8 @@ impl Field for RbField {
         self.passages & direction_flag == direction_flag
     }
 }
+
+impl_field_debug!(RbField);
 
 // ----------------------------------------
 // Grid
@@ -123,6 +126,7 @@ impl_grid_debug!(RbGrid);
 // Generator
 // ----------------------------------------
 
+#[derive(Debug, Clone)]
 pub struct RbGenerator {
     rng: ChaChaRng,
 }
