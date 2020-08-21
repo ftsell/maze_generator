@@ -2,7 +2,7 @@ use crate::prelude::*;
 use bitflags::_core::fmt::Formatter;
 
 bitflags! {
-    pub struct PassageFlags: u8 {
+    struct PassageFlags: u8 {
         const NORTH = 0b00000001;
         const EAST = 0b00000010;
         const SOUTH = 0b00000100;
@@ -22,12 +22,19 @@ impl From<&Direction> for PassageFlags {
     }
 }
 
+/// [`Field`] implementation used by the recursive-backtracking algorithm
 #[derive(Clone, Copy)]
 pub struct RbField {
-    pub(super) passages: PassageFlags,
+    passages: PassageFlags,
 }
 
 impl RbField {
+    pub(super) fn new() -> RbField {
+        RbField {
+            passages: PassageFlags::NONE,
+        }
+    }
+
     pub(super) fn add_passage(&mut self, direction: &Direction) {
         self.passages = self.passages | direction.into()
     }

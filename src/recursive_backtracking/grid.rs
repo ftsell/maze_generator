@@ -1,7 +1,9 @@
 use crate::prelude::*;
 use crate::recursive_backtracking::RbField;
+use crate::util::*;
 use std::mem;
 
+/// [`Grid`] implementation used by the recursive-backtracking algorithm
 #[derive(Clone)]
 pub struct RbGrid {
     pub(super) size: (i32, i32),
@@ -12,8 +14,8 @@ pub struct RbGrid {
 
 impl RbGrid {
     pub(super) fn set_field(&mut self, coordinates: Coordinates, field: RbField) {
-        if self.are_coordinates_inside(&coordinates) {
-            let i = self.coords2index(&coordinates) as usize;
+        if are_coordinates_inside(self, &coordinates) {
+            let i = coords2index(self, &coordinates) as usize;
             let _ = mem::replace(&mut self.data[i], field);
         } else {
             panic!(format!(
@@ -21,16 +23,6 @@ impl RbGrid {
                 coordinates
             ));
         }
-    }
-
-    fn _index2coords(&self, i: i32) -> Coordinates {
-        let x = i % self.get_size().0;
-        let y = (i - x) / self.get_size().0;
-        (x, y)
-    }
-
-    fn coords2index(&self, coords: &Coordinates) -> i32 {
-        (coords.1 * self.get_size().0) + coords.0
     }
 }
 
@@ -50,10 +42,10 @@ impl Grid for RbGrid {
     }
 
     fn get_field(&self, coordinates: &Coordinates) -> Result<&Self::FieldType, ()> {
-        if self.are_coordinates_inside(coordinates) {
+        if are_coordinates_inside(self, coordinates) {
             Ok(self
                 .data
-                .get(self.coords2index(coordinates) as usize)
+                .get(coords2index(self, coordinates) as usize)
                 .unwrap())
         } else {
             Err(())

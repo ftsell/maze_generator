@@ -4,12 +4,18 @@ use crate::prelude::*;
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
 
+/// [`Generator`] implementation used by the recursive-backtracking algorithm
 #[derive(Debug, Clone)]
 pub struct RbGenerator {
     rng: ChaChaRng,
 }
 
 impl RbGenerator {
+    /// Create a new [`Generator`] instance which uses recursive-backtracking to generate a maze
+    ///
+    /// Optionally a 32 bit seed can be provided to seed the internal random generator.
+    /// Giving a seed results in identical mazes being generated which omitting it sources the
+    /// random generator from entropy.
     pub fn new(seed: Option<[u8; 32]>) -> RbGenerator {
         RbGenerator {
             rng: match seed {
@@ -69,9 +75,7 @@ impl Generator for RbGenerator {
 
         for _ix in 0..width {
             for _iy in 0..height {
-                grid.data.push(RbField {
-                    passages: PassageFlags::NONE,
-                });
+                grid.data.push(RbField::new());
             }
         }
 

@@ -1,3 +1,7 @@
+//! Recursive-Backtracking algorithm implementation
+//!
+//! TODO Explain this algorithm
+
 mod field;
 mod generator;
 mod grid;

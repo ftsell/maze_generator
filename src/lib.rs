@@ -52,6 +52,7 @@
 #[macro_use]
 pub mod prelude;
 pub mod recursive_backtracking;
+mod util;
 
 #[macro_use]
 extern crate bitflags;
