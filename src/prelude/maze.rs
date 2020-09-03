@@ -40,8 +40,15 @@ impl Maze {
                 .map(|dir| dir.clone())
                 .collect();
 
-            // TODO set field type correctly
-            Some(Field::new(FieldType::Normal, coordinates.clone(), passages))
+            let field_type = if self.start == coordinates {
+                FieldType::Start
+            } else if self.goal == coordinates {
+                FieldType::Goal
+            } else {
+                FieldType::Normal
+            };
+
+            Some(Field::new(field_type, coordinates.clone(), passages))
         } else {
             None
         }
