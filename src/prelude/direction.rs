@@ -1,4 +1,5 @@
 use rand::prelude::*;
+use std::fmt::Formatter;
 
 /// The four cardinal directions
 ///
@@ -41,5 +42,16 @@ impl Direction {
             Direction::South,
             Direction::West,
         ]
+    }
+}
+
+impl std::fmt::Display for Direction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
+            Direction::North => "North",
+            Direction::East => "East",
+            Direction::South => "South",
+            Direction::West => "West",
+        })
     }
 }
