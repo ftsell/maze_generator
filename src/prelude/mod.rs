@@ -14,7 +14,7 @@ pub use maze::*;
 pub trait Generator {
     /// Key function to generate a maze
     ///
-    /// The returned [`Grid`] will have the provided width and height. It can be any rectangular
-    /// shape.
+    /// The returned [`Maze`] will have the provided width and height.
+    /// It can be any rectangular shape.
     fn generate(&mut self, width: i32, height: i32) -> Maze;
 }
