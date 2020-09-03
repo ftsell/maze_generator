@@ -2,11 +2,12 @@ use crate::prelude::*;
 use petgraph::graphmap::GraphMap;
 use petgraph::Undirected;
 
-type MazeGraph = GraphMap<Coordinates, (), Undirected>;
+pub(crate) type MazeGraph = GraphMap<Coordinates, (), Undirected>;
 
 /// A collection of [`Field`]s with passages between them.
 ///
 /// Use one of the provided [`Generator`]s to create an instance of this type.
+#[derive(Clone)]
 pub struct Maze {
     pub(crate) grid: MazeGraph,
     /// At which coordinates the start field lies
@@ -19,6 +20,9 @@ pub struct Maze {
 
 impl Maze {
     pub(crate) fn new(width: i32, height: i32, start: Coordinates, goal: Coordinates) -> Self {
+        debug_assert!(width > 0, "maze width should be >0");
+        debug_assert!(height > 0, "maze height should be >0");
+
         Maze {
             grid: GraphMap::with_capacity((width * height) as usize, 0),
             size: (width, height),

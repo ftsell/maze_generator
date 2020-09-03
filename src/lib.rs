@@ -1,11 +1,9 @@
-#![deny(trivial_casts, trivial_numeric_casts, unsafe_code)]
+#![deny(trivial_numeric_casts, trivial_casts, unsafe_code)]
 #![warn(
     missing_crate_level_docs,
     missing_docs,
     missing_debug_implementations,
     missing_copy_implementations,
-    unused_crate_dependencies,
-    unused_extern_crates,
     unused_import_braces,
     unused_lifetimes,
     unused_qualifications
@@ -22,9 +20,9 @@
 //! use maze_generator::recursive_backtracking::RbGenerator;
 //!
 //! let mut generator = RbGenerator::new(Some([42; 32]));
-//! let grid = generator.generate(3, 3);
+//! let maze = generator.generate(3, 3);
 //!
-//! assert_eq!(format!("{:?}", grid),
+//! assert_eq!(format!("{:?}", maze),
 //! "·-·-·-·
 //! |S|   |
 //! · ·-· ·
@@ -41,21 +39,19 @@
 //! use maze_generator::recursive_backtracking::RbGenerator;
 //!
 //! let mut generator = RbGenerator::new(Some([42; 32]));
-//! let grid = generator.generate(3, 3);
+//! let maze = generator.generate(3, 3);
 //!
-//! assert_eq!(format!("{:?}", grid.get_field(&grid.start).unwrap()),
+//! assert_eq!(format!("{:?}", maze.get_field(&maze.start).unwrap()),
 //!            "Field { north: \"wall\", east: \"wall\", south: \"passage\", west: \"wall\" }");
 //! ```
-//!
+
+#[cfg(test)]
+#[macro_use]
+extern crate quickcheck;
+#[cfg(test)]
+#[macro_use]
+mod test_util;
 
 #[macro_use]
 pub mod prelude;
 pub mod recursive_backtracking;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
