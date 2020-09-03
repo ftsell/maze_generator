@@ -1,6 +1,6 @@
 [package]
 name = "maze_generator"
-version = "1.0.0-rc.2"
+version = "1.0.0-rc.3"
 authors = ["Finn-Thorben Sell <dev@finn-thorben.me>"]
 edition = "2018"
 description = "A library of different maze generation algorithms."

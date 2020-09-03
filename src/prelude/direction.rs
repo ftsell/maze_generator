@@ -1,5 +1,4 @@
 use rand::prelude::*;
-use std::fmt::Formatter;
 
 /// The four cardinal directions
 ///
