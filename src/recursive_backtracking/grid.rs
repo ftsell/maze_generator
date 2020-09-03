@@ -26,7 +26,7 @@ impl RbGrid {
     }
 }
 
-impl Grid for RbGrid {
+impl Maze for RbGrid {
     type FieldType = RbField;
 
     fn get_size(&self) -> &(i32, i32) {
@@ -53,4 +53,4 @@ impl Grid for RbGrid {
     }
 }
 
-impl_grid_debug!(RbGrid);
+//impl_grid_debug!(RbGrid);

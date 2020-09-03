@@ -8,8 +8,7 @@
     unused_extern_crates,
     unused_import_braces,
     unused_lifetimes,
-    unused_qualifications,
-    unused_results
+    unused_qualifications
 )]
 
 //! This is a collection of different maze generation algorithms.
@@ -44,18 +43,14 @@
 //! let mut generator = RbGenerator::new(Some([42; 32]));
 //! let grid = generator.generate(3, 3);
 //!
-//! assert_eq!(format!("{:?}", grid.get_field(grid.get_start()).unwrap()),
-//!            "RbField { north: \"wall\", east: \"wall\", south: \"passage\", west: \"wall\" }");
+//! assert_eq!(format!("{:?}", grid.get_field(&grid.start).unwrap()),
+//!            "Field { north: \"wall\", east: \"wall\", south: \"passage\", west: \"wall\" }");
 //! ```
 //!
 
 #[macro_use]
 pub mod prelude;
 pub mod recursive_backtracking;
-mod util;
-
-#[macro_use]
-extern crate bitflags;
 
 #[cfg(test)]
 mod tests {

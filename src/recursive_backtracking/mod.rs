@@ -12,10 +12,10 @@
 //! 4. The algorithm terminates when it has backed up all the way to the starting point.
 //!
 
-mod field;
+//mod field;
 mod generator;
-mod grid;
+//mod grid;
 
-pub use field::RbField;
+//pub use field::RbField;
 pub use generator::RbGenerator;
-pub use grid::RbGrid;
+//pub use grid::RbGrid;
