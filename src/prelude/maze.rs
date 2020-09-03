@@ -40,9 +40,9 @@ impl Maze {
                 .map(|dir| dir.clone())
                 .collect();
 
-            let field_type = if self.start == coordinates {
+            let field_type = if &self.start == coordinates {
                 FieldType::Start
-            } else if self.goal == coordinates {
+            } else if &self.goal == coordinates {
                 FieldType::Goal
             } else {
                 FieldType::Normal
@@ -89,13 +89,11 @@ impl std::fmt::Debug for Maze {
                     f.write_str("|")?;
                 }
 
-                if self.start == (ix, iy).into() {
-                    f.write_str("S")?;
-                } else if self.goal == (ix, iy).into() {
-                    f.write_str("G")?;
-                } else {
-                    f.write_str(" ")?;
-                }
+                f.write_str(match field.field_type {
+                    FieldType::Start => "S",
+                    FieldType::Goal => "G",
+                    _ => " ",
+                })?;
             }
             f.write_str("|\n")?;
 

@@ -27,17 +27,33 @@ impl RbGenerator {
     ///
     /// Carves passages in all directions in random order from the current coordinates but only
     /// if the field in that direction has not yet been processed.
-    fn carve_passages_from(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
+    ///
+    /// Returns coordinates of the goal field
+    fn carve_passages_from(
+        &mut self,
+        maze: &mut Maze,
+        current_coordinates: Coordinates,
+    ) -> Coordinates {
+        let mut goal_coords = maze.start;
         for i_dir in Direction::gen_random_order(&mut self.rng).iter() {
             let next_coords = current_coordinates.next(i_dir);
 
             if maze.are_coordinates_inside(&next_coords)
                 && maze.grid.neighbors(next_coords).count() == 0
             {
-                // TODO set goal field correctly
                 maze.grid.add_edge(current_coordinates, next_coords, ());
-                self.carve_passages_from(maze, next_coords);
+                if goal_coords == maze.start {
+                    goal_coords = self.carve_passages_from(maze, next_coords);
+                } else {
+                    self.carve_passages_from(maze, next_coords);
+                }
             }
+        }
+
+        if goal_coords == maze.start {
+            current_coordinates
+        } else {
+            goal_coords
         }
     }
 }
@@ -47,7 +63,8 @@ impl Generator for RbGenerator {
         let start = (0, 0).into();
         let mut maze = Maze::new(width, height, start, (0, 0).into());
 
-        self.carve_passages_from(&mut maze, start);
+        let goal = self.carve_passages_from(&mut maze, start);
+        maze.goal = goal;
 
         maze
     }
