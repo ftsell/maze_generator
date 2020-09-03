@@ -10,7 +10,8 @@ pub struct Coordinates {
 }
 
 impl Coordinates {
-    pub(crate) fn next(&self, direction: &Direction) -> Self {
+    /// Returns the next neighboring coordinates in a specific direction
+    pub fn next(&self, direction: &Direction) -> Self {
         Self {
             x: self.x
                 + match direction {
