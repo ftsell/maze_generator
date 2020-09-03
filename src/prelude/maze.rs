@@ -2,13 +2,13 @@ use crate::prelude::*;
 use petgraph::graphmap::GraphMap;
 use petgraph::Undirected;
 
-type Grid = GraphMap<Coordinates, (), Undirected>;
+type MazeGraph = GraphMap<Coordinates, (), Undirected>;
 
 /// A collection of [`Field`]s with passages between them.
 ///
 /// Use one of the provided [`Generator`]s to create an instance of this type.
 pub struct Maze {
-    pub(crate) grid: Grid,
+    pub(crate) grid: MazeGraph,
     /// At which coordinates the start field lies
     pub start: Coordinates,
     /// At which coordinates the goal field lies
@@ -107,5 +107,13 @@ impl std::fmt::Debug for Maze {
         }
 
         Ok(())
+    }
+}
+
+// implemented as into and not accessor because after exposing the internal graph, data integrity
+// can not be guaranteed (size, start, goal could be made invalid).
+impl Into<MazeGraph> for Maze {
+    fn into(self) -> MazeGraph {
+        self.grid
     }
 }
