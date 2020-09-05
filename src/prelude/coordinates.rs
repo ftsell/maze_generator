@@ -11,6 +11,11 @@ pub struct Coordinates {
 }
 
 impl Coordinates {
+    /// Create a new instance from the specified coordinate components
+    pub fn new(x: i32, y: i32) -> Self {
+        Coordinates { x, y }
+    }
+
     /// Returns the next neighboring coordinates in a specific direction
     pub fn next(&self, direction: &Direction) -> Self {
         Self {
