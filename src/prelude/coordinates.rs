@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use std::fmt::{Debug, Display, Formatter};
 
 /// Two-Dimensional coordinates used for addressing fields in a maze.
 #[derive(Debug, Copy, Clone, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -41,5 +42,11 @@ impl From<(i32, i32)> for Coordinates {
             x: source.0,
             y: source.1,
         }
+    }
+}
+
+impl Display for Coordinates {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("({}, {})", self.x, self.y))
     }
 }
