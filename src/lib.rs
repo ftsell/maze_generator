@@ -54,4 +54,5 @@ mod test_util;
 
 #[macro_use]
 pub mod prelude;
+pub mod ellers_algorithm;
 pub mod recursive_backtracking;

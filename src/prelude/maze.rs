@@ -9,7 +9,7 @@ pub(crate) type MazeGraph = GraphMap<Coordinates, (), Undirected>;
 /// Use one of the provided [`Generator`]s to create an instance of this type.
 #[derive(Clone)]
 pub struct Maze {
-    pub(crate) grid: MazeGraph,
+    pub(crate) graph: MazeGraph,
     /// At which coordinates the start field lies
     pub start: Coordinates,
     /// At which coordinates the goal field lies
@@ -24,7 +24,7 @@ impl Maze {
         debug_assert!(height > 0, "maze height should be >0");
 
         Maze {
-            grid: GraphMap::with_capacity((width * height) as usize, 0),
+            graph: GraphMap::with_capacity((width * height) as usize, 0),
             size: (width, height),
             start,
             goal,
@@ -38,7 +38,7 @@ impl Maze {
             let passages: Vec<_> = Direction::all()
                 .iter()
                 .filter(|dir| {
-                    self.grid
+                    self.graph
                         .contains_edge(coordinates.clone(), coordinates.next(dir))
                 })
                 .map(|dir| dir.clone())
@@ -118,6 +118,6 @@ impl std::fmt::Debug for Maze {
 // can not be guaranteed (size, start, goal could be made invalid).
 impl Into<MazeGraph> for Maze {
     fn into(self) -> MazeGraph {
-        self.grid
+        self.graph
     }
 }
