@@ -1,5 +1,7 @@
 use crate::prelude::*;
+use petgraph::algo::is_isomorphic;
 use petgraph::graphmap::GraphMap;
+use petgraph::stable_graph::DefaultIx;
 use petgraph::Undirected;
 
 pub(crate) type MazeGraph = GraphMap<Coordinates, (), Undirected>;
@@ -121,3 +123,17 @@ impl Into<MazeGraph> for Maze {
         self.graph
     }
 }
+
+impl PartialEq for Maze {
+    fn eq(&self, other: &Self) -> bool {
+        self.start == other.start
+            && self.goal == other.goal
+            && self.size == other.size
+            && is_isomorphic(
+                &self.graph.clone().into_graph::<DefaultIx>(),
+                &other.graph.clone().into_graph::<DefaultIx>(),
+            )
+    }
+}
+
+impl Eq for Maze {}

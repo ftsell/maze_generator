@@ -321,4 +321,5 @@ mod test {
     test_all_coordinates_have_fields!(super::EllersGenerator);
     test_route_from_start_to_goal_exists!(super::EllersGenerator);
     test_all_fields_connected!(super::EllersGenerator);
+    test_generation_is_deterministic!(super::EllersGenerator);
 }

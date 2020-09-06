@@ -106,3 +106,33 @@ pub(crate) fn test_all_fields_connected(
         }
     }
 }
+
+macro_rules! test_generation_is_deterministic {
+    ($generator_name:ty) => {
+        quickcheck! {
+            fn test_generation_is_deterministic(seed: u128, width: i32, height: i32) -> quickcheck::TestResult {
+                let gen1 = <$generator_name>::new(Some(crate::test_util::convert_seed(seed)));
+                let gen2 = <$generator_name>::new(Some(crate::test_util::convert_seed(seed)));
+                crate::test_util::test_generation_is_deterministic(gen1, gen2, width, height)
+            }
+        }
+    };
+}
+
+pub(crate) fn test_generation_is_deterministic<T>(
+    mut gen1: T,
+    mut gen2: T,
+    width: i32,
+    height: i32,
+) -> TestResult
+where
+    T: Generator,
+{
+    match generate_maze(&mut gen1, width, height) {
+        None => TestResult::discard(),
+        Some(maze1) => match generate_maze(&mut gen2, width, height) {
+            None => TestResult::failed(),
+            Some(maze2) => TestResult::from_bool(maze1 == maze2),
+        },
+    }
+}

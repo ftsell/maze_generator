@@ -88,4 +88,5 @@ mod test {
     test_all_coordinates_have_fields!(super::RbGenerator);
     test_route_from_start_to_goal_exists!(super::RbGenerator);
     test_all_fields_connected!(super::RbGenerator);
+    test_generation_is_deterministic!(super::RbGenerator);
 }
