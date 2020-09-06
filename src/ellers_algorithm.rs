@@ -152,7 +152,7 @@
 use crate::prelude::*;
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashSet, VecDeque};
 
 const HORIZONTAL_JOIN_CHANCE: f64 = 0.5;
 
@@ -278,7 +278,6 @@ impl EllersGenerator {
                     .find(|set| set.is_empty())
                     .expect("no empty set found")
                     .insert(coordinates);
-                //self.sets[i_x].insert(coordinates);
             }
         }
     }
@@ -291,6 +290,25 @@ impl EllersGenerator {
                 (i_x as i32 + 1, current_y).into(),
             );
         }
+    }
+
+    fn find_suitable_goal(&self, start: Coordinates) -> Coordinates {
+        // do breadth-first search for the field which has the most distance
+        let mut already_visited = HashSet::new();
+        let mut queue: VecDeque<Coordinates> = self.graph.neighbors(start).collect();
+        let mut last_coords = start;
+
+        while let Some(i_coords) = queue.pop_front() {
+            queue.extend(
+                self.graph
+                    .neighbors(i_coords)
+                    .filter(|c| !already_visited.contains(c)),
+            );
+            already_visited.insert(i_coords);
+            last_coords = i_coords;
+        }
+
+        last_coords
     }
 }
 
@@ -311,6 +329,7 @@ impl Generator for EllersGenerator {
         let goal = (0, 0).into();
         let mut maze = Maze::new(width, height, start, goal);
         maze.graph = self.graph.clone();
+        maze.goal = self.find_suitable_goal(start);
 
         maze
     }
