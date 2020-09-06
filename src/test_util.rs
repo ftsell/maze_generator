@@ -75,6 +75,11 @@ pub(crate) fn test_route_from_start_to_goal_exists(
         Some(maze) => {
             let start = maze.start.clone();
             let goal = maze.goal.clone();
+
+            if start == goal {
+                return TestResult::failed();
+            }
+
             let graph: MazeGraph = maze.into();
 
             quickcheck::TestResult::from_bool(algo::has_path_connecting(&graph, start, goal, None))
