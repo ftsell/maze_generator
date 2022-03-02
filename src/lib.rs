@@ -1,6 +1,6 @@
 #![deny(trivial_numeric_casts, trivial_casts, unsafe_code)]
 #![warn(
-    missing_crate_level_docs,
+    rustdoc::missing_crate_level_docs,
     missing_docs,
     missing_debug_implementations,
     missing_copy_implementations,
