@@ -4,7 +4,6 @@ use petgraph::graphmap::GraphMap;
 use petgraph::stable_graph::DefaultIx;
 use petgraph::Undirected;
 
-use std::collections::HashMap;
 use std::fmt::Write;
 
 pub(crate) type MazeGraph = GraphMap<Coordinates, (), Undirected>;
@@ -120,27 +119,21 @@ impl std::fmt::Debug for Maze {
 }
 
 impl Maze {
-    /// Generate an SVG version of the maze
-    pub fn to_svg(&self, options: Option<HashMap<&str, i32>>) -> Result<String, std::fmt::Error> {
-        // Default generation options
-        let mut opthash = HashMap::from([
-            ("padding", 10),
-            ("height", 10 + (self.size.0 + self.size.1) * 10),
-            ("markersize", 2),
-        ]);
-        // Override with supplied options where possible
-        match options {
-            Some(options) => {
-                for (opt, val) in options {
-                    opthash.insert(opt, val);
-                }
-            }
-            None => (),
-        }
+    /// Generate an SVG version of the maze, returned as a String which you can then write to a file...or whatever
+    pub fn to_svg(&self, options: Option<SVGoptions>) -> Result<String, std::fmt::Error> {
+        // Generation options or  defaults
+        let svgoptions: SVGoptions = match options {
+            Some(opt) => opt,
+            None => SVGoptions::new(),
+        };
         // Use these options
-        let padding = opthash["padding"]; // Pad the maze all around by this amount.
-        let markersize = opthash["markersize"]; // Size of the Start and Goal markers
-        let mut height = opthash["height"]; // Height and width of the maze image (excluding padding), in pixels
+        let padding = svgoptions.padding; // Pad the maze all around by this amount.
+                                          //let strokewidth = svgoptions.strokewidth; // Thikness of lines
+        let markersize = svgoptions.markersize; // Size of the Start and Goal markers
+        let mut height = svgoptions.height; // Height and width of the maze image (excluding padding), in pixels
+        if height == 0 {
+            height = padding + (self.size.0 + self.size.1) * padding;
+        }
         let mut width = height * self.size.0 / self.size.1;
 
         // Scaling factors mapping maze coordinates to image/svg coordinates
@@ -175,8 +168,13 @@ impl Maze {
 
         writeln!(svg, "<defs>\n<style type=\"text/css\"><![CDATA[").unwrap();
         writeln!(svg, "line {{").unwrap();
-        writeln!(svg, "    stroke: #000000;\n    stroke-linecap: square;").unwrap();
-        writeln!(svg, "    stroke-width: 5;\n}}").unwrap();
+        writeln!(
+            svg,
+            "    stroke: {};\n    stroke-linecap: square;",
+            svgoptions.strokecol
+        )
+        .unwrap();
+        writeln!(svg, "    stroke-width: {};\n}}", svgoptions.strokewidth).unwrap();
         writeln!(svg, "]]></style>\n</defs>").unwrap();
 
         for iy in 0..self.size.1 {
@@ -224,12 +222,12 @@ impl Maze {
                     FieldType::Start => {
                         x1 = ix * scx + scx2;
                         y1 = iy * scy + scy2;
-                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"red\" stroke-width=\"{}\" fill=\"red\" />", x1, y1, markersize, markersize + 1).unwrap();
+                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"{}\" stroke-width=\"{}\" fill=\"{}\" />", x1, y1, markersize, svgoptions.startcol, markersize + 1, svgoptions.startcol).unwrap();
                     }
                     FieldType::Goal => {
                         x1 = ix * scx + scx2;
                         y1 = iy * scy + scy2;
-                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"blue\" stroke-width=\"{}\" fill=\"blue\" />", x1, y1, markersize, markersize + 1).unwrap();
+                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"{}\" stroke-width=\"{}\" fill=\"{}\" />", x1, y1, markersize, svgoptions.goalcol, markersize + 1, svgoptions.goalcol).unwrap();
                     }
                     _ => continue,
                 };
