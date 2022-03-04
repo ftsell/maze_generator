@@ -120,21 +120,15 @@ impl std::fmt::Debug for Maze {
 
 impl Maze {
     /// Generate an SVG version of the maze, returned as a String which you can then write to a file...or whatever
-    pub fn to_svg(&self, options: Option<SVGoptions>) -> Result<String, std::fmt::Error> {
-        // Generation options or  defaults
-        let svgoptions: SVGoptions = match options {
-            Some(opt) => opt,
-            None => SVGoptions::new(),
-        };
-        // Use these options
-        let padding = svgoptions.padding; // Pad the maze all around by this amount.
-                                          //let strokewidth = svgoptions.strokewidth; // Thikness of lines
+    pub fn to_svg(&self, svgoptions:SVGoptions) -> Result<String, std::fmt::Error> {
+        // Get the options for convenience
+        let padding = svgoptions.padding; // Maze cell size - also padding around 
         let markersize = svgoptions.markersize; // Size of the Start and Goal markers
-        let mut height = svgoptions.height; // Height and width of the maze image (excluding padding), in pixels
+        let mut height = svgoptions.height; // Height of the maze image (excluding padding), in pixels
         if height == 0 {
-            height = padding + (self.size.0 + self.size.1) * padding;
+            height = (2 + self.size.1) * padding;
         }
-        let mut width = height * self.size.0 / self.size.1;
+        let mut width = height * self.size.0 / self.size.1; // Derive width based on height
 
         // Scaling factors mapping maze coordinates to image/svg coordinates
         let scx = width / self.size.0;
