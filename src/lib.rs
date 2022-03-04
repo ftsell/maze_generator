@@ -55,4 +55,6 @@ mod test_util;
 #[macro_use]
 pub mod prelude;
 pub mod ellers_algorithm;
+pub mod growing_tree;
+pub mod prims_algorithm;
 pub mod recursive_backtracking;
