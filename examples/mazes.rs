@@ -160,7 +160,9 @@ fn main() {
     };
 
     if svgoutput {
-        let svg: String = match maze.to_svg(Some(myoptions)) {
+    if svgoutput {
+        let svg: String = match maze.to_svg(myoptions) { // Use my options
+        //let svg: String = match maze.to_svg(SVGoptions::new()) { // Use default options
             Ok(val) => val,
             Err(_) => "".to_string(),
         };
