@@ -76,6 +76,10 @@ pub(crate) fn test_route_from_start_to_goal_exists(
             let start = maze.start.clone();
             let goal = maze.goal.clone();
 
+            if start == goal && width == 1 && height == 1 {
+                return TestResult::passed(); // degenerate example: single cell maze
+            }
+
             if start == goal {
                 return TestResult::failed();
             }
