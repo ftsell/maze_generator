@@ -4,11 +4,13 @@ mod coordinates;
 mod direction;
 mod field;
 mod maze;
+mod svgoptions;
 
 pub use coordinates::*;
 pub use direction::*;
 pub use field::*;
 pub use maze::*;
+pub use svgoptions::*;
 
 /// Generic generator Api implemented by all algorithms to generate a maze
 pub trait Generator {
