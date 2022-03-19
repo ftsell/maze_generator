@@ -18,15 +18,25 @@
 use crate::prelude::*;
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
-//use std::collections::{HashSet, VecDeque};
+
+/// Different ways in which the next root cell is selected from the stack of possibilities
+#[derive(Debug, Clone, Copy)]
+pub enum GrowingTreeSelectionMethod {
+    /// A random cell. Equivalent to Prim's algorithm.
+    Random,
+    /// The cell most recently added to the stack. Equivalent to Recursive backtracker algorithm.
+    MostRecent,
+    /// The first cell on the stack.
+    First,
+}
 
 /// [`Generator`] implementation which uses the recursive-backtracking algorithm.
 #[derive(Debug, Clone)]
 pub struct GrowingTreeGenerator {
     rng: ChaChaRng,
-    selectionmethod: i32,
+    /// The method by which to select the next candidate cell from the available possibilities
+    pub selectionmethod: GrowingTreeSelectionMethod,
     cellstack: Vec<Coordinates>,
-    //frontier: Vec<Coordinates>,
     visited: Vec<Coordinates>,
     neighbours: Vec<Coordinates>,
 }
@@ -45,26 +55,11 @@ impl GrowingTreeGenerator {
                 None => ChaChaRng::from_entropy(),
                 Some(seed) => ChaChaRng::from_seed(seed),
             },
-            selectionmethod: 0, // default to First
+            selectionmethod: GrowingTreeSelectionMethod::First,
             cellstack: Vec::new(),
-            //frontier: Vec::new(),
             visited: Vec::new(),
             neighbours: Vec::new(),
         }
-    }
-
-    /// Set the selection method
-    ///
-    /// # Arguments
-    ///
-    /// * `selectionmethod` the method for choosing the next cell in the stack
-    /// 1 = Most recent, equivalent to Recursive backtracker
-    /// 2 = Random, equivalent to Prim's
-    /// any other value = First. This is the constructor default.
-    ///
-    /// This is a setter method so that all the generator constructors retain the same signature
-    pub fn set_selectionmethod(&mut self, selectionmethod: i32) {
-        self.selectionmethod = selectionmethod;
     }
 
     /// Core algorithm implementation
@@ -84,11 +79,10 @@ impl GrowingTreeGenerator {
         self.cellstack.push(current_coordinates);
         self.visited.push(current_coordinates); // Mark it as visited
 
-        while ! self.cellstack.is_empty() {
+        while !self.cellstack.is_empty() {
             self.find_unvisited_neighbours(maze, current_coordinates);
-            //eprintln!("Stacks: cellstack {}, neighbours {}, current {:?}", self.cellstack.len(), self.neighbours.len(), current_coordinates);
 
-            if self.neighbours.is_empty()  {
+            if self.neighbours.is_empty() {
                 // We've reached a dead end - remove the current_coordinates from the stack
                 if self.cellstack.contains(&current_coordinates) {
                     let idx = self
@@ -107,9 +101,11 @@ impl GrowingTreeGenerator {
                 // And now select a new current cell according to 'selectionmethod' parameter
                 // pop and remove wont fail because we just tested for non-zero length
                 current_coordinates = match self.selectionmethod {
-                    1 => self.cellstack.pop().unwrap(), // Most recent, equivalent to Recursive backtracker
-                    2 => self.cellstack[self.rng.gen_range(0, self.cellstack.len())], // Random, equivalent to Prim's
-                    _ => self.cellstack.remove(0),                                    // First
+                    GrowingTreeSelectionMethod::MostRecent => self.cellstack.pop().unwrap(),
+                    GrowingTreeSelectionMethod::Random => {
+                        self.cellstack[self.rng.gen_range(0, self.cellstack.len())]
+                    }
+                    GrowingTreeSelectionMethod::First => self.cellstack.remove(0),
                 };
             } else {
                 // We have some neighbours so we can make a passage
@@ -131,7 +127,7 @@ impl GrowingTreeGenerator {
         goal_coordinates
     }
 
-    // Find the neighbours of this cell that have NOT been visited
+    /// Find the neighbours of this cell that have NOT been visited
     fn find_unvisited_neighbours(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
         self.neighbours.clear(); // Clear the current neighbour list
 
