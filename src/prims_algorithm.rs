@@ -60,18 +60,18 @@ impl PrimsGenerator {
     /// Returns coordinates of the goal field
     fn carve_passages_from(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
         // Mark our starting cell as 'in' and find its frontier
-        self.markcell(maze, current_coordinates);
+        self.mark_cell(maze, current_coordinates);
 
-        while ! self.frontier.is_empty() {
+        while !self.frontier.is_empty() {
             // Choose a random frontier cell
             let next_coords = self.frontier[self.rng.gen_range(0, self.frontier.len())];
 
             // Choose a random 'in' neighbour of that cell
             self.find_visited_neighbours(maze, next_coords);
-            if ! self.neighbours.is_empty() {
+            if !self.neighbours.is_empty() {
                 let ncell = self.neighbours[self.rng.gen_range(0, self.neighbours.len())]; // neighbours is  aways non-zero length
                 maze.graph.add_edge(next_coords, ncell, ()); // Knock down the wall between them
-                self.markcell(maze, next_coords); // frontier cell is now 'in'
+                self.mark_cell(maze, next_coords); // frontier cell is now 'in'
             } else {
                 // No neighbours - panic
                 self.frontier.clear(); // Will cause a non-panic return but the maze will be incomplete
@@ -80,8 +80,8 @@ impl PrimsGenerator {
         }
     }
 
-    // Mark a cell as visited and it's unvisited neighbours as frontier cells
-    fn markcell(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
+    /// Mark a cell as visited and it's unvisited neighbours as frontier cells
+    fn mark_cell(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
         // Mark the current cell as visited
         if !self.visited.contains(&current_coordinates) {
             self.visited.push(current_coordinates);
@@ -109,7 +109,7 @@ impl PrimsGenerator {
         }
     }
 
-    // Find the neighbours of this cell that have been visited
+    /// Find the neighbours of this cell that have been visited
     fn find_visited_neighbours(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
         self.neighbours.clear(); // Clear the current neighbour list
 
@@ -122,7 +122,7 @@ impl PrimsGenerator {
         }
     }
 
-    // do breadth-first search for the field which has the most distance
+    /// Do breadth-first search for the field which has the most distance
     // Cloned from ellers_algorithm, but passing in maze rather than using the self.graph element (which we don't have here)
     fn find_suitable_goal(&self, maze: &mut Maze, start: Coordinates) -> Coordinates {
         let mut already_visited = HashSet::new();
