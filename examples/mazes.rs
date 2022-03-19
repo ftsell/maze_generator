@@ -1,22 +1,19 @@
-//! Maze generator test program
+//! Maze generator example program
 //!
 use maze_generator::ellers_algorithm::EllersGenerator;
-use maze_generator::growing_tree::GrowingTreeGenerator;
+use maze_generator::growing_tree::*;
 use maze_generator::prelude::*;
 use maze_generator::prims_algorithm::PrimsGenerator;
 use maze_generator::recursive_backtracking::RbGenerator;
 
-//use std::collections::HashMap;
 use clap::{Arg, Command};
 use std::time::Instant;
 
-//use std::io::{self};
-
 fn main() {
     // Define the CLI arguments
-    let matches = Command::new("Maze Test Program")
+    let matches = Command::new("Maze Example Program")
         .version("0.1.0")
-        .about("Test harness for maze_generator library crate")
+        .about("Generate mazes from the command line using maze_generator library crate")
         .arg(
             Arg::new("type")
                 .short('t')
@@ -105,7 +102,6 @@ fn main() {
 
     let mut rngseed = None;
     let isstatic = matches.is_present("static");
-    //eprintln!("Static {:?}", isstatic);
     if isstatic {
         rngseed = Some([42; 32]);
     }
@@ -126,7 +122,11 @@ fn main() {
         "gt" | "growing" | "growingtree" => {
             actualtype = String::from("Growing tree");
             let mut generator = GrowingTreeGenerator::new(rngseed);
-            generator.set_selectionmethod(selectionmethod);
+            generator.selectionmethod = match selectionmethod {
+                1 => growing_tree::GrowingTreeSelectionMethod::MostRecent,
+                2 => growing_tree::GrowingTreeSelectionMethod::Random,
+                _ => growing_tree::GrowingTreeSelectionMethod::First,
+            };
             generator.generate(width, height)
         }
         "prim" | "prims" => {
@@ -153,16 +153,15 @@ fn main() {
     }
 
     // SVG generation options, lurid green lines and a smaller cellsize, use the defaults for everything else
-    let myoptions = SVGoptions {
+    let myoptions = SvgOptions {
         strokecol: String::from("green"),
         padding: 8,
+        height: Some(400),
         ..Default::default()
     };
 
     if svgoutput {
-    if svgoutput {
-        let svg: String = match maze.to_svg(myoptions) { // Use my options
-        //let svg: String = match maze.to_svg(SVGoptions::new()) { // Use default options
+        let svg: String = match maze.to_svg(myoptions) {
             Ok(val) => val,
             Err(_) => "".to_string(),
         };
