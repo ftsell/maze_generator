@@ -3,22 +3,23 @@
 
 sign-commit = true
 sign-tag = true
+dev-version = true
 dev-version-ext = "next"
 
 tag-name = "v{{version}}"
 tag-message = """Release {{crate_name}} version {{version}}
 
-# New features
+New features
 
 - Added new generator algorithm "Growing Tree"
 - Added new generator algorithm "Prim's Algorithm"
 - Added support for exporting mazes as SVG
 
-# Bugfixes
+Bugfixes
 
 - Fix a bug in the Recursive Backtracking generator where it would only generate an empty maze if the size of the target maze was 1,1. It now properly generates a maze with only one cell.
 
-# Misc
+Misc
 
 - Added an example binary that uses this library
 """
