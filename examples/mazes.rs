@@ -123,9 +123,9 @@ fn main() {
             actualtype = String::from("Growing tree");
             let mut generator = GrowingTreeGenerator::new(rngseed);
             generator.selectionmethod = match selectionmethod {
-                1 => growing_tree::GrowingTreeSelectionMethod::MostRecent,
-                2 => growing_tree::GrowingTreeSelectionMethod::Random,
-                _ => growing_tree::GrowingTreeSelectionMethod::First,
+                1 => GrowingTreeSelectionMethod::MostRecent,
+                2 => GrowingTreeSelectionMethod::Random,
+                _ => GrowingTreeSelectionMethod::First,
             };
             generator.generate(width, height)
         }
