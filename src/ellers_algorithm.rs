@@ -192,12 +192,12 @@ impl EllersGenerator {
             .sets
             .iter()
             .find(|set| set.contains(&field1))
-            .expect(&format!("Expected to find coordinates {}", field1));
+            .unwrap_or_else(|| panic!("Expected to find coordinates {}", field1));
         let set2 = self
             .sets
             .iter()
             .find(|set| set.contains(&field2))
-            .expect(&format!("Expected to find coordinates {}", field2));
+            .unwrap_or_else(|| panic!("Expected to find coordinates {}", field2));
 
         if set1 != set2 {
             let index1 = self.sets.iter().position(|set| set == set1).unwrap();

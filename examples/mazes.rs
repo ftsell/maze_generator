@@ -76,28 +76,19 @@ fn main() {
     let num_str = matches.value_of("width");
     let width = match num_str {
         None => 10,
-        Some(s) => match s.parse::<i32>() {
-            Ok(n) => n,
-            Err(_) => 11,
-        },
+        Some(s) => s.parse::<i32>().unwrap_or(11),
     };
 
     let num_str = matches.value_of("height");
     let height = match num_str {
         None => 10,
-        Some(s) => match s.parse::<i32>() {
-            Ok(n) => n,
-            Err(_) => 11,
-        },
+        Some(s) => s.parse::<i32>().unwrap_or(11),
     };
 
     let num_str = matches.value_of("method");
-    let selectionmethod = match num_str {
+    let selection_method = match num_str {
         None => 0,
-        Some(s) => match s.parse::<i32>() {
-            Ok(n) => n,
-            Err(_) => 1,
-        },
+        Some(s) => s.parse::<i32>().unwrap_or(1),
     };
 
     let mut rngseed = None;
@@ -122,7 +113,7 @@ fn main() {
         "gt" | "growing" | "growingtree" => {
             actualtype = String::from("Growing tree");
             let mut generator = GrowingTreeGenerator::new(rngseed);
-            generator.selection_method = match selectionmethod {
+            generator.selection_method = match selection_method {
                 1 => GrowingTreeSelectionMethod::MostRecent,
                 2 => GrowingTreeSelectionMethod::Random,
                 _ => GrowingTreeSelectionMethod::First,
