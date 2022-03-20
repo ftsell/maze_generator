@@ -150,7 +150,7 @@
 //!
 
 use std::collections::{BTreeSet, HashSet, VecDeque};
-
+use anyhow::{Context, Result};
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
 
@@ -189,26 +189,30 @@ impl EllersGenerator {
     ///
     /// Only changes anything if the two fields are not already in the same set.
     /// Also keeps track of the connection in `self.graph`.
-    fn join_sets_of_fields(&mut self, field1: Coordinates, field2: Coordinates) {
+    fn join_sets_of_fields(&mut self, field1: Coordinates, field2: Coordinates) -> Result<()> {
         let set1 = self
             .sets
             .iter()
             .find(|set| set.contains(&field1))
-            .unwrap_or_else(|| panic!("Expected to find coordinates {}", field1));
+            .ok_or_else(|| GenericGeneratorError::InternalError(format!("Expected to find coordinates {}", field1)))?;
         let set2 = self
             .sets
             .iter()
             .find(|set| set.contains(&field2))
-            .unwrap_or_else(|| panic!("Expected to find coordinates {}", field2));
+            .ok_or_else(|| GenericGeneratorError::InternalError(format!("Expected to find coordinates {}", field2)))?;
 
         if set1 != set2 {
-            let index1 = self.sets.iter().position(|set| set == set1).unwrap();
-            let index2 = self.sets.iter().position(|set| set == set2).unwrap();
+            let index1 = self.sets.iter().position(|set| set == set1)
+                .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not determine position of set")))?;
+            let index2 = self.sets.iter().position(|set| set == set2)
+                .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not determine position of set")))?;
 
             self.sets[index1] = set1.union(set2).cloned().collect();
             self.sets[index2] = EllersSet::new();
             self.graph.add_edge(field1, field2, ());
         }
+
+        Ok(())
     }
 
     /// Initialize the fields of the first row to each exist in its own set.
@@ -224,16 +228,18 @@ impl EllersGenerator {
 
     /// Randomly join fields but only if they are not already in the same set.
     /// When joining, merge the two sets (which indicates that the cells are now connected)
-    fn randomly_join_fields(&mut self, current_y: i32) {
+    fn randomly_join_fields(&mut self, current_y: i32) -> Result<()> {
         // iterate over all fields and randomly join them with the field on the right
         for i_x in 0..(self.sets.len() - 1) {
             if self.rng.gen_bool(HORIZONTAL_JOIN_CHANCE) {
                 self.join_sets_of_fields(
                     (i_x as i32, current_y).into(),
                     (i_x as i32 + 1, current_y).into(),
-                );
+                ).with_context(|| "Could not randomly join fields")?;
             }
         }
+
+        Ok(())
     }
 
     /// For each set, randomly create vertical connections downward to the next row.
@@ -263,7 +269,7 @@ impl EllersGenerator {
     }
 
     /// Flesh out the next row by creating sets for the fields not already vertically connected.
-    fn flesh_out_next_row(&mut self, current_y: i32) {
+    fn flesh_out_next_row(&mut self, current_y: i32) -> Result<()> {
         let next_y = current_y + 1;
         // add the coordinate to its set if not already present
         for i_x in 0..self.sets.len() {
@@ -277,20 +283,24 @@ impl EllersGenerator {
                 self.sets
                     .iter_mut()
                     .find(|set| set.is_empty())
-                    .expect("no empty set found")
+                    .ok_or_else(|| GenericGeneratorError::InternalError(String::from("No empty set found")))?
                     .insert(coordinates);
             }
         }
+
+        Ok(())
     }
 
     /// For the last row, join all adjacent cells which do not yet share a set.
-    fn join_last_rows(&mut self, current_y: i32) {
+    fn join_last_rows(&mut self, current_y: i32) -> Result<()> {
         for i_x in 0..(self.sets.len() - 1) {
             self.join_sets_of_fields(
                 (i_x as i32, current_y).into(),
                 (i_x as i32 + 1, current_y).into(),
-            );
+            ).with_context(|| "Could not join last rows")?;
         }
+
+        Ok(())
     }
 
     fn find_suitable_goal(&self, start: Coordinates) -> Coordinates {
@@ -314,16 +324,19 @@ impl EllersGenerator {
 }
 
 impl Generator for EllersGenerator {
-    fn generate(&mut self, width: i32, height: i32) -> Maze {
+    fn generate(&mut self, width: i32, height: i32) -> Result<Maze> {
         self.graph = MazeGraph::with_capacity((width * height) as usize, 0);
 
         self.init_fields_first_row(width);
         for y in 0..height {
-            self.randomly_join_fields(y);
+            self.randomly_join_fields(y)
+                .with_context(|| "Could not generate maze")?;
             self.create_downward_connections(y);
-            self.flesh_out_next_row(y);
+            self.flesh_out_next_row(y)
+                .with_context(|| "Could not generate maze")?;
         }
-        self.join_last_rows(height - 1);
+        self.join_last_rows(height - 1)
+            .with_context(|| "Could not generate maze")?;
 
         // convert hashset representation to final maze
         let start = (0, 0).into();
@@ -332,7 +345,7 @@ impl Generator for EllersGenerator {
         maze.graph = self.graph.clone();
         maze.goal = self.find_suitable_goal(start);
 
-        maze
+        Ok(maze)
     }
 }
 

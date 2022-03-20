@@ -17,6 +17,8 @@ categories = ["algorithms", "game-development"]
 rand = "0.7.3"
 rand_chacha = "0.2.2"
 petgraph = "0.5.1"
+thiserror = "1.0.30"
+anyhow = "1.0.56"
 
 [dev-dependencies]
 quickcheck = "0.9.1"

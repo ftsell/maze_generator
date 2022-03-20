@@ -21,6 +21,7 @@
 //! [Jamis Buck's Buckblog](http://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm.html)*
 
 use crate::prelude::*;
+use anyhow::{Context, Result};
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
 use std::collections::{HashSet, VecDeque};
@@ -58,9 +59,10 @@ impl PrimsGenerator {
     /// if the field in that direction has not yet been processed.
     ///
     /// Returns coordinates of the goal field
-    fn carve_passages_from(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
+    fn carve_passages_from(&mut self, maze: &mut Maze, current_coordinates: Coordinates) -> Result<()> {
         // Mark our starting cell as 'in' and find its frontier
-        self.mark_cell(maze, current_coordinates);
+        self.mark_cell(maze, current_coordinates)
+            .with_context(|| String::from("Could not parse passages"))?;
 
         while !self.frontier.is_empty() {
             // Choose a random frontier cell
@@ -71,17 +73,20 @@ impl PrimsGenerator {
             if !self.neighbours.is_empty() {
                 let ncell = self.neighbours[self.rng.gen_range(0, self.neighbours.len())]; // neighbours is  aways non-zero length
                 maze.graph.add_edge(next_coords, ncell, ()); // Knock down the wall between them
-                self.mark_cell(maze, next_coords); // frontier cell is now 'in'
+                self.mark_cell(maze, next_coords)
+                    .with_context(|| "Could not parse passages")?; // frontier cell is now 'in'
             } else {
                 // No neighbours - panic
                 self.frontier.clear(); // Will cause a non-panic return but the maze will be incomplete
                 eprintln!("No neighbours! {:?}", next_coords);
             }
         }
+
+        Ok(())
     }
 
     /// Mark a cell as visited and it's unvisited neighbours as frontier cells
-    fn mark_cell(&mut self, maze: &mut Maze, current_coordinates: Coordinates) {
+    fn mark_cell(&mut self, maze: &mut Maze, current_coordinates: Coordinates) -> Result<()> {
         // Mark the current cell as visited
         if !self.visited.contains(&current_coordinates) {
             self.visited.push(current_coordinates);
@@ -93,7 +98,8 @@ impl PrimsGenerator {
                 .frontier
                 .iter()
                 .position(|&r| r == current_coordinates)
-                .unwrap();
+                .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not find coordinates in frontier list")))
+                .with_context(|| "Could not mark cell")?;
             self.frontier.remove(idx);
         }
 
@@ -107,6 +113,8 @@ impl PrimsGenerator {
                 self.frontier.push(next_coords);
             }
         }
+
+        Ok(())
     }
 
     /// Find the neighbours of this cell that have been visited
@@ -144,14 +152,15 @@ impl PrimsGenerator {
 }
 
 impl Generator for PrimsGenerator {
-    fn generate(&mut self, width: i32, height: i32) -> Maze {
+    fn generate(&mut self, width: i32, height: i32) -> Result<Maze> {
         let start = (0, 0).into();
         let mut maze = Maze::new(width, height, start, (0, 0).into());
 
-        self.carve_passages_from(&mut maze, start);
+        self.carve_passages_from(&mut maze, start)
+            .with_context(|| "Could not generate maze")?;
         maze.goal = self.find_suitable_goal(&mut maze, start);
 
-        maze
+        Ok(maze)
     }
 }
 

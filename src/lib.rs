@@ -6,7 +6,10 @@
     missing_copy_implementations,
     unused_import_braces,
     unused_lifetimes,
-    unused_qualifications
+    unused_qualifications,
+    clippy::unwrap_used,
+    clippy::expect_used,
+    clippy::panic,
 )]
 
 //! This is a collection of different maze generation algorithms.
@@ -20,7 +23,7 @@
 //! use maze_generator::recursive_backtracking::RbGenerator;
 //!
 //! let mut generator = RbGenerator::new(Some([42; 32]));
-//! let maze = generator.generate(3, 3);
+//! let maze = generator.generate(3, 3).unwrap();
 //!
 //! assert_eq!(format!("{:?}", maze),
 //! "·-·-·-·
@@ -39,7 +42,7 @@
 //! use maze_generator::recursive_backtracking::RbGenerator;
 //!
 //! let mut generator = RbGenerator::new(Some([42; 32]));
-//! let maze = generator.generate(3, 3);
+//! let maze = generator.generate(3, 3).unwrap();
 //!
 //! assert_eq!(format!("{:?}", maze.get_field(&maze.start).unwrap()),
 //!            "Field { north: \"wall\", east: \"wall\", south: \"passage\", west: \"wall\" }");

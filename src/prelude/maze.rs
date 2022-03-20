@@ -3,7 +3,7 @@ use petgraph::algo::is_isomorphic;
 use petgraph::graphmap::GraphMap;
 use petgraph::stable_graph::DefaultIx;
 use petgraph::Undirected;
-
+use anyhow::{anyhow, Result};
 use std::fmt::Write;
 
 pub(crate) type MazeGraph = GraphMap<Coordinates, (), Undirected>;
@@ -78,7 +78,7 @@ impl std::fmt::Debug for Maze {
                 f.write_str("·")?;
                 if self
                     .get_field(&(ix, iy).into())
-                    .unwrap()
+                    .ok_or(std::fmt::Error{})?
                     .has_passage(&Direction::North)
                 {
                     f.write_str(" ")?;
@@ -90,7 +90,8 @@ impl std::fmt::Debug for Maze {
 
             // print left passage and room icon
             for ix in 0..self.size.0 {
-                let field = self.get_field(&(ix, iy).into()).unwrap();
+                let field = self.get_field(&(ix, iy).into())
+                    .ok_or(std::fmt::Error{})?;
                 if field.has_passage(&Direction::West) {
                     f.write_str(" ")?;
                 } else {
@@ -120,7 +121,7 @@ impl std::fmt::Debug for Maze {
 
 impl Maze {
     /// Generate an SVG version of the maze, returned as a String which you can then write to a file or use directly
-    pub fn to_svg(&self, svgoptions: SvgOptions) -> Result<String, std::fmt::Error> {
+    pub fn to_svg(&self, svgoptions: SvgOptions) -> Result<String> {
         // Get the options for convenience
         let padding = svgoptions.padding; // Pad the maze all around by this amount.
         let markersize = svgoptions.markersize; // Size of the Start and Goal markers
@@ -146,9 +147,9 @@ impl Maze {
 
         // Write the SVG to the return String
         let mut svg = String::new();
-        writeln!(svg, "<?xml version=\"1.0\" encoding=\"utf-8\"?>").unwrap();
-        writeln!(svg, "<svg xmlns=\"http://www.w3.org/2000/svg\"").unwrap();
-        writeln!(svg, "    xmlns:xlink=\"http://www.w3.org/1999/xlink\"").unwrap();
+        writeln!(svg, "<?xml version=\"1.0\" encoding=\"utf-8\"?>")?;
+        writeln!(svg, "<svg xmlns=\"http://www.w3.org/2000/svg\"")?;
+        writeln!(svg, "    xmlns:xlink=\"http://www.w3.org/1999/xlink\"")?;
         writeln!(
             svg,
             "    width=\"{}\" height=\"{}\" viewBox=\"{} {} {} {}\">",
@@ -158,26 +159,24 @@ impl Maze {
             -padding,
             width + 2 * padding,
             height + 2 * padding
-        )
-        .unwrap();
+        )?;
 
-        writeln!(svg, "<defs>\n<style type=\"text/css\"><![CDATA[").unwrap();
-        writeln!(svg, "line {{").unwrap();
+        writeln!(svg, "<defs>\n<style type=\"text/css\"><![CDATA[")?;
+        writeln!(svg, "line {{")?;
         writeln!(
             svg,
             "    stroke: {};\n    stroke-linecap: square;",
             svgoptions.strokecol
-        )
-        .unwrap();
-        writeln!(svg, "    stroke-width: {};\n}}", svgoptions.strokewidth).unwrap();
-        writeln!(svg, "]]></style>\n</defs>").unwrap();
+        )?;
+        writeln!(svg, "    stroke-width: {};\n}}", svgoptions.strokewidth)?;
+        writeln!(svg, "]]></style>\n</defs>")?;
 
         for iy in 0..self.size.1 {
             // print top passage
             for ix in 0..self.size.0 {
                 if self
                     .get_field(&(ix, iy).into())
-                    .unwrap()
+                    .ok_or_else(|| anyhow!("Could not get maze field at coordinates {},{}", ix, iy))?
                     .has_passage(&Direction::North)
                 {
                     // Do nothing. This code structure keeps the SVG output aligned with the original text debug output
@@ -190,14 +189,14 @@ impl Maze {
                         svg,
                         "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\"/>",
                         x1, y1, x2, y2
-                    )
-                    .unwrap();
+                    )?;
                 }
             }
 
             // print left passage and room markers
             for ix in 0..self.size.0 {
-                let field = self.get_field(&(ix, iy).into()).unwrap();
+                let field = self.get_field(&(ix, iy).into())
+                    .ok_or_else(|| anyhow!("Could not get maze field at coordinates {},{}", ix, iy))?;
                 if field.has_passage(&Direction::West) {
                     // Do nothing
                 } else {
@@ -209,20 +208,19 @@ impl Maze {
                         svg,
                         "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\"/>",
                         x1, y1, x2, y2
-                    )
-                    .unwrap();
+                    )?;
                 }
                 // Special cells
                 match field.field_type {
                     FieldType::Start => {
                         x1 = ix * scx + scx2;
                         y1 = iy * scy + scy2;
-                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"{}\" stroke-width=\"{}\" fill=\"{}\" />", x1, y1, markersize, svgoptions.startcol, markersize + 1, svgoptions.startcol).unwrap();
+                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"{}\" stroke-width=\"{}\" fill=\"{}\" />", x1, y1, markersize, svgoptions.startcol, markersize + 1, svgoptions.startcol)?;
                     }
                     FieldType::Goal => {
                         x1 = ix * scx + scx2;
                         y1 = iy * scy + scy2;
-                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"{}\" stroke-width=\"{}\" fill=\"{}\" />", x1, y1, markersize, svgoptions.goalcol, markersize + 1, svgoptions.goalcol).unwrap();
+                        writeln!(svg, "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" stroke=\"{}\" stroke-width=\"{}\" fill=\"{}\" />", x1, y1, markersize, svgoptions.goalcol, markersize + 1, svgoptions.goalcol)?;
                     }
                     _ => continue,
                 };
@@ -237,8 +235,7 @@ impl Maze {
                 svg,
                 "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\"/>",
                 x1, y1, x2, y2
-            )
-            .unwrap();
+            )?;
 
             // print right border line
             x1 = (self.size.0) * scx;
@@ -249,10 +246,9 @@ impl Maze {
                 svg,
                 "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\"/>",
                 x1, y1, x2, y2
-            )
-            .unwrap();
+            )?;
         }
-        writeln!(svg, "</svg>").unwrap();
+        writeln!(svg, "</svg>")?;
 
         Ok(svg)
     }

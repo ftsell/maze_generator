@@ -7,9 +7,10 @@ use maze_generator::prims_algorithm::PrimsGenerator;
 use maze_generator::recursive_backtracking::RbGenerator;
 
 use clap::{Arg, Command};
+use anyhow::Result;
 use std::time::Instant;
 
-fn main() {
+fn main() -> Result<()> {
     // Define the CLI arguments
     let matches = Command::new("Maze Example Program")
         .version("0.1.0")
@@ -108,7 +109,7 @@ fn main() {
         "ellers" | "eller" => {
             actualtype = String::from("Eller's");
             let mut generator = EllersGenerator::new(rngseed);
-            generator.generate(width, height)
+            generator.generate(width, height)?
         }
         "gt" | "growing" | "growingtree" => {
             actualtype = String::from("Growing tree");
@@ -118,18 +119,18 @@ fn main() {
                 2 => GrowingTreeSelectionMethod::Random,
                 _ => GrowingTreeSelectionMethod::First,
             };
-            generator.generate(width, height)
+            generator.generate(width, height)?
         }
         "prim" | "prims" => {
             actualtype = String::from("Prim's");
             let mut generator = PrimsGenerator::new(rngseed);
-            generator.generate(width, height)
+            generator.generate(width, height)?
         }
         _ => {
             // Default to RbGenerator, so no need to specify it
             actualtype = String::from("Recursive backtracing");
             let mut generator = RbGenerator::new(rngseed);
-            generator.generate(width, height)
+            generator.generate(width, height)?
         }
     };
 
@@ -158,4 +159,6 @@ fn main() {
         };
         println!("{}", svg);
     }
+
+    Ok(())
 }

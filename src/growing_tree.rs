@@ -16,6 +16,7 @@
 //! [Jamis Buck's Buckblog]( http://weblog.jamisbuck.org/2011/1/27/maze-generation-growing-tree-algorithm.html)*
 
 use crate::prelude::*;
+use anyhow::{Context, Result};
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
 
@@ -68,7 +69,7 @@ impl GrowingTreeGenerator {
         &mut self,
         maze: &mut Maze,
         start_coordinates: Coordinates,
-    ) -> Coordinates {
+    ) -> Result<Coordinates> {
         let mut current_coordinates = start_coordinates;
         let mut goal_coordinates = current_coordinates;
         let mut max_q = 0;
@@ -87,7 +88,8 @@ impl GrowingTreeGenerator {
                         .cell_stack
                         .iter()
                         .position(|&r| r == current_coordinates)
-                        .unwrap();
+                        .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not find position of coordinates in cell_stack")))
+                        .with_context(|| "Could not carve passages")?;
                     self.cell_stack.remove(idx);
                 }
 
@@ -99,7 +101,9 @@ impl GrowingTreeGenerator {
                 // And now select a new current cell according to 'selectionmethod' parameter
                 // pop and remove wont fail because we just tested for non-zero length
                 current_coordinates = match self.selection_method {
-                    GrowingTreeSelectionMethod::MostRecent => self.cell_stack.pop().unwrap(),
+                    GrowingTreeSelectionMethod::MostRecent => self.cell_stack.pop()
+                        .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not pop most recent cell from cell_stack")))
+                        .with_context(|| "Could not carve passage")?,
                     GrowingTreeSelectionMethod::Random => {
                         self.cell_stack[self.rng.gen_range(0, self.cell_stack.len())]
                     }
@@ -122,7 +126,8 @@ impl GrowingTreeGenerator {
                 }
             }
         }
-        goal_coordinates
+
+        Ok(goal_coordinates)
     }
 
     /// Find the neighbours of this cell that have NOT been visited
@@ -140,13 +145,14 @@ impl GrowingTreeGenerator {
 }
 
 impl Generator for GrowingTreeGenerator {
-    fn generate(&mut self, width: i32, height: i32) -> Maze {
+    fn generate(&mut self, width: i32, height: i32) -> Result<Maze> {
         let start = (0, 0).into();
         let mut maze = Maze::new(width, height, start, (0, 0).into());
 
-        maze.goal = self.carve_passages_from(&mut maze, start);
+        maze.goal = self.carve_passages_from(&mut maze, start)
+            .with_context(|| "Could not generate maze")?;
 
-        maze
+        Ok(maze)
     }
 }
 

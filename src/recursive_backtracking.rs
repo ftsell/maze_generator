@@ -12,6 +12,7 @@
 //! 4. The algorithm terminates when it has backed up all the way to the starting point.
 
 use crate::prelude::*;
+use anyhow::Result;
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
 
@@ -72,7 +73,7 @@ impl RbGenerator {
 }
 
 impl Generator for RbGenerator {
-    fn generate(&mut self, width: i32, height: i32) -> Maze {
+    fn generate(&mut self, width: i32, height: i32) -> Result<Maze> {
         let start = (0, 0).into();
         let mut maze = Maze::new(width, height, start, (0, 0).into());
         maze.graph.add_node(start);
@@ -80,7 +81,7 @@ impl Generator for RbGenerator {
         let goal = self.carve_passages_from(&mut maze, start);
         maze.goal = goal;
 
-        maze
+        Ok(maze)
     }
 }
 

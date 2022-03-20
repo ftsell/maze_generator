@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use anyhow::{ensure, Result};
 use petgraph::algo;
 use quickcheck::TestResult;
 
@@ -9,12 +10,9 @@ pub(crate) fn convert_seed(seed: u128) -> [u8; 32] {
     result
 }
 
-fn generate_maze(gen: &mut impl Generator, width: i32, height: i32) -> Option<Maze> {
-    if width <= 0 || height <= 0 {
-        None
-    } else {
-        Some(gen.generate(width, height))
-    }
+fn generate_maze(gen: &mut impl Generator, width: i32, height: i32) -> Result<Maze> {
+    ensure!(width > 0 && height > 0, "Invalid size");
+    gen.generate(width, height)
 }
 
 macro_rules! test_all_coordinates_have_fields {
@@ -34,8 +32,11 @@ pub(crate) fn test_all_coordinates_have_fields(
     height: i32,
 ) -> TestResult {
     match generate_maze(&mut gen, width, height) {
-        None => TestResult::discard(),
-        Some(maze) => {
+        Err(e) => match e.downcast_ref::<GenericGeneratorError>() {
+            Some(_) => TestResult::failed(),
+            None => TestResult::discard(),
+        }
+        Ok(maze) => {
             for ix in 0..maze.size.0 {
                 for iy in 0..maze.size.1 {
                     if maze.get_field(&(ix, iy).into()).is_none() {
@@ -66,8 +67,11 @@ pub(crate) fn test_route_from_start_to_goal_exists(
     height: i32,
 ) -> TestResult {
     match generate_maze(&mut gen, width, height) {
-        None => TestResult::discard(),
-        Some(maze) => {
+        Err(e) => match e.downcast_ref::<GenericGeneratorError>() {
+            Some(_) => TestResult::failed(),
+            None => TestResult::discard(),
+        }
+        Ok(maze) => {
             let start = maze.start;
             let goal = maze.goal;
 
@@ -103,8 +107,11 @@ pub(crate) fn test_all_fields_connected(
     height: i32,
 ) -> TestResult {
     match generate_maze(&mut gen, width, height) {
-        None => TestResult::discard(),
-        Some(maze) => {
+        Err(e) => match e.downcast_ref::<GenericGeneratorError>() {
+            Some(_) => TestResult::failed(),
+            None => TestResult::discard(),
+        }
+        Ok(maze) => {
             let graph: MazeGraph = maze.into();
             TestResult::from_bool(algo::connected_components(&graph) == 1)
         }
@@ -133,10 +140,16 @@ where
     T: Generator,
 {
     match generate_maze(&mut gen1, width, height) {
-        None => TestResult::discard(),
-        Some(maze1) => match generate_maze(&mut gen2, width, height) {
-            None => TestResult::failed(),
-            Some(maze2) => TestResult::from_bool(maze1 == maze2),
+        Err(e) => match e.downcast_ref::<GenericGeneratorError>() {
+            Some(_) => TestResult::failed(),
+            None => TestResult::discard(),
+        }
+        Ok(maze1) => match generate_maze(&mut gen2, width, height) {
+            Err(e) => match e.downcast_ref::<GenericGeneratorError>() {
+                Some(_) => TestResult::failed(),
+                None => TestResult::discard(),
+            }
+            Ok(maze2) => TestResult::from_bool(maze1 == maze2),
         },
     }
 }
