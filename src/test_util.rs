@@ -5,17 +5,12 @@ use quickcheck::TestResult;
 pub(crate) fn convert_seed(seed: u128) -> [u8; 32] {
     let mut result: [u8; 32] = [0; 32];
     let seed: [u8; 16] = seed.to_ne_bytes();
-    for i in 0..16 {
-        result[i] = seed[i];
-    }
-
+    result[0..16].copy_from_slice(&seed);
     result
 }
 
 fn generate_maze(gen: &mut impl Generator, width: i32, height: i32) -> Option<Maze> {
-    if width <= 0 {
-        None
-    } else if height <= 0 {
+    if width <= 0 || height <= 0 {
         None
     } else {
         Some(gen.generate(width, height))
