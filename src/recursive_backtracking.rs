@@ -75,6 +75,7 @@ impl Generator for RbGenerator {
     fn generate(&mut self, width: i32, height: i32) -> Maze {
         let start = (0, 0).into();
         let mut maze = Maze::new(width, height, start, (0, 0).into());
+        maze.graph.add_node(start);
 
         let goal = self.carve_passages_from(&mut maze, start);
         maze.goal = goal;
