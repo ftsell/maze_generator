@@ -1,10 +1,12 @@
-use crate::prelude::*;
+use std::fmt::Write;
+
+use anyhow::{anyhow, Result};
 use petgraph::algo::is_isomorphic;
 use petgraph::graphmap::GraphMap;
 use petgraph::stable_graph::DefaultIx;
 use petgraph::Undirected;
-use anyhow::{anyhow, Result};
-use std::fmt::Write;
+
+use crate::prelude::*;
 
 pub(crate) type MazeGraph = GraphMap<Coordinates, (), Undirected>;
 
@@ -78,7 +80,7 @@ impl std::fmt::Debug for Maze {
                 f.write_str("·")?;
                 if self
                     .get_field(&(ix, iy).into())
-                    .ok_or(std::fmt::Error{})?
+                    .ok_or(std::fmt::Error {})?
                     .has_passage(&Direction::North)
                 {
                     f.write_str(" ")?;
@@ -90,8 +92,7 @@ impl std::fmt::Debug for Maze {
 
             // print left passage and room icon
             for ix in 0..self.size.0 {
-                let field = self.get_field(&(ix, iy).into())
-                    .ok_or(std::fmt::Error{})?;
+                let field = self.get_field(&(ix, iy).into()).ok_or(std::fmt::Error {})?;
                 if field.has_passage(&Direction::West) {
                     f.write_str(" ")?;
                 } else {
@@ -176,7 +177,9 @@ impl Maze {
             for ix in 0..self.size.0 {
                 if self
                     .get_field(&(ix, iy).into())
-                    .ok_or_else(|| anyhow!("Could not get maze field at coordinates {},{}", ix, iy))?
+                    .ok_or_else(|| {
+                        anyhow!("Could not get maze field at coordinates {},{}", ix, iy)
+                    })?
                     .has_passage(&Direction::North)
                 {
                     // Do nothing. This code structure keeps the SVG output aligned with the original text debug output
@@ -195,8 +198,9 @@ impl Maze {
 
             // print left passage and room markers
             for ix in 0..self.size.0 {
-                let field = self.get_field(&(ix, iy).into())
-                    .ok_or_else(|| anyhow!("Could not get maze field at coordinates {},{}", ix, iy))?;
+                let field = self.get_field(&(ix, iy).into()).ok_or_else(|| {
+                    anyhow!("Could not get maze field at coordinates {},{}", ix, iy)
+                })?;
                 if field.has_passage(&Direction::West) {
                     // Do nothing
                 } else {

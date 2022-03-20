@@ -15,10 +15,11 @@
 //! *Explanation and credits to
 //! [Jamis Buck's Buckblog]( http://weblog.jamisbuck.org/2011/1/27/maze-generation-growing-tree-algorithm.html)*
 
-use crate::prelude::*;
 use anyhow::{Context, Result};
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
+
+use crate::prelude::*;
 
 /// Different ways in which the next root cell is selected from the stack of possibilities
 #[derive(Debug, Clone, Copy)]
@@ -88,7 +89,11 @@ impl GrowingTreeGenerator {
                         .cell_stack
                         .iter()
                         .position(|&r| r == current_coordinates)
-                        .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not find position of coordinates in cell_stack")))
+                        .ok_or_else(|| {
+                            GenericGeneratorError::InternalError(String::from(
+                                "Could not find position of coordinates in cell_stack",
+                            ))
+                        })
                         .with_context(|| "Could not carve passages")?;
                     self.cell_stack.remove(idx);
                 }
@@ -101,8 +106,14 @@ impl GrowingTreeGenerator {
                 // And now select a new current cell according to 'selectionmethod' parameter
                 // pop and remove wont fail because we just tested for non-zero length
                 current_coordinates = match self.selection_method {
-                    GrowingTreeSelectionMethod::MostRecent => self.cell_stack.pop()
-                        .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not pop most recent cell from cell_stack")))
+                    GrowingTreeSelectionMethod::MostRecent => self
+                        .cell_stack
+                        .pop()
+                        .ok_or_else(|| {
+                            GenericGeneratorError::InternalError(String::from(
+                                "Could not pop most recent cell from cell_stack",
+                            ))
+                        })
                         .with_context(|| "Could not carve passage")?,
                     GrowingTreeSelectionMethod::Random => {
                         self.cell_stack[self.rng.gen_range(0, self.cell_stack.len())]
@@ -149,7 +160,8 @@ impl Generator for GrowingTreeGenerator {
         let start = (0, 0).into();
         let mut maze = Maze::new(width, height, start, (0, 0).into());
 
-        maze.goal = self.carve_passages_from(&mut maze, start)
+        maze.goal = self
+            .carve_passages_from(&mut maze, start)
             .with_context(|| "Could not generate maze")?;
 
         Ok(maze)

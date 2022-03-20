@@ -1,14 +1,15 @@
 //! Maze generator example program
 //!
+use std::time::Instant;
+
+use anyhow::Result;
+use clap::{Arg, Command};
+
 use maze_generator::ellers_algorithm::EllersGenerator;
 use maze_generator::growing_tree::*;
 use maze_generator::prelude::*;
 use maze_generator::prims_algorithm::PrimsGenerator;
 use maze_generator::recursive_backtracking::RbGenerator;
-
-use clap::{Arg, Command};
-use anyhow::Result;
-use std::time::Instant;
 
 fn main() -> Result<()> {
     // Define the CLI arguments

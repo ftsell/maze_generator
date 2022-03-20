@@ -20,11 +20,13 @@
 //! *Explanation and credits to
 //! [Jamis Buck's Buckblog](http://weblog.jamisbuck.org/2011/1/10/maze-generation-prim-s-algorithm.html)*
 
-use crate::prelude::*;
+use std::collections::{HashSet, VecDeque};
+
 use anyhow::{Context, Result};
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
-use std::collections::{HashSet, VecDeque};
+
+use crate::prelude::*;
 
 /// [`Generator`] implementation which uses the recursive-backtracking algorithm.
 #[derive(Debug, Clone)]
@@ -59,7 +61,11 @@ impl PrimsGenerator {
     /// if the field in that direction has not yet been processed.
     ///
     /// Returns coordinates of the goal field
-    fn carve_passages_from(&mut self, maze: &mut Maze, current_coordinates: Coordinates) -> Result<()> {
+    fn carve_passages_from(
+        &mut self,
+        maze: &mut Maze,
+        current_coordinates: Coordinates,
+    ) -> Result<()> {
         // Mark our starting cell as 'in' and find its frontier
         self.mark_cell(maze, current_coordinates)
             .with_context(|| String::from("Could not parse passages"))?;
@@ -98,7 +104,11 @@ impl PrimsGenerator {
                 .frontier
                 .iter()
                 .position(|&r| r == current_coordinates)
-                .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not find coordinates in frontier list")))
+                .ok_or_else(|| {
+                    GenericGeneratorError::InternalError(String::from(
+                        "Could not find coordinates in frontier list",
+                    ))
+                })
                 .with_context(|| "Could not mark cell")?;
             self.frontier.remove(idx);
         }

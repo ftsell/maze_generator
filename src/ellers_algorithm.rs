@@ -150,6 +150,7 @@
 //!
 
 use std::collections::{BTreeSet, HashSet, VecDeque};
+
 use anyhow::{Context, Result};
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
@@ -194,18 +195,42 @@ impl EllersGenerator {
             .sets
             .iter()
             .find(|set| set.contains(&field1))
-            .ok_or_else(|| GenericGeneratorError::InternalError(format!("Expected to find coordinates {}", field1)))?;
+            .ok_or_else(|| {
+                GenericGeneratorError::InternalError(format!(
+                    "Expected to find coordinates {}",
+                    field1
+                ))
+            })?;
         let set2 = self
             .sets
             .iter()
             .find(|set| set.contains(&field2))
-            .ok_or_else(|| GenericGeneratorError::InternalError(format!("Expected to find coordinates {}", field2)))?;
+            .ok_or_else(|| {
+                GenericGeneratorError::InternalError(format!(
+                    "Expected to find coordinates {}",
+                    field2
+                ))
+            })?;
 
         if set1 != set2 {
-            let index1 = self.sets.iter().position(|set| set == set1)
-                .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not determine position of set")))?;
-            let index2 = self.sets.iter().position(|set| set == set2)
-                .ok_or_else(|| GenericGeneratorError::InternalError(String::from("Could not determine position of set")))?;
+            let index1 = self
+                .sets
+                .iter()
+                .position(|set| set == set1)
+                .ok_or_else(|| {
+                    GenericGeneratorError::InternalError(String::from(
+                        "Could not determine position of set",
+                    ))
+                })?;
+            let index2 = self
+                .sets
+                .iter()
+                .position(|set| set == set2)
+                .ok_or_else(|| {
+                    GenericGeneratorError::InternalError(String::from(
+                        "Could not determine position of set",
+                    ))
+                })?;
 
             self.sets[index1] = set1.union(set2).cloned().collect();
             self.sets[index2] = EllersSet::new();
@@ -235,7 +260,8 @@ impl EllersGenerator {
                 self.join_sets_of_fields(
                     (i_x as i32, current_y).into(),
                     (i_x as i32 + 1, current_y).into(),
-                ).with_context(|| "Could not randomly join fields")?;
+                )
+                .with_context(|| "Could not randomly join fields")?;
             }
         }
 
@@ -275,15 +301,13 @@ impl EllersGenerator {
         for i_x in 0..self.sets.len() {
             let coordinates = (i_x as i32, next_y).into();
 
-            if !self
-                .sets
-                .iter()
-                .any(|set| set.contains(&coordinates))
-            {
+            if !self.sets.iter().any(|set| set.contains(&coordinates)) {
                 self.sets
                     .iter_mut()
                     .find(|set| set.is_empty())
-                    .ok_or_else(|| GenericGeneratorError::InternalError(String::from("No empty set found")))?
+                    .ok_or_else(|| {
+                        GenericGeneratorError::InternalError(String::from("No empty set found"))
+                    })?
                     .insert(coordinates);
             }
         }
@@ -297,7 +321,8 @@ impl EllersGenerator {
             self.join_sets_of_fields(
                 (i_x as i32, current_y).into(),
                 (i_x as i32 + 1, current_y).into(),
-            ).with_context(|| "Could not join last rows")?;
+            )
+            .with_context(|| "Could not join last rows")?;
         }
 
         Ok(())

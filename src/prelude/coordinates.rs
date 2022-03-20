@@ -1,5 +1,6 @@
-use crate::prelude::*;
 use std::fmt::{Debug, Display, Formatter};
+
+use crate::prelude::*;
 
 /// Two-Dimensional coordinates used for addressing fields in a maze.
 #[derive(Debug, Copy, Clone, Default, Ord, PartialOrd, Eq, PartialEq, Hash)]

@@ -11,10 +11,11 @@
 //! 3. If all adjacent fields have been visited, back up to the last field with unvisited neighbors.
 //! 4. The algorithm terminates when it has backed up all the way to the starting point.
 
-use crate::prelude::*;
 use anyhow::Result;
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
+
+use crate::prelude::*;
 
 /// [`Generator`] implementation which uses the recursive-backtracking algorithm.
 #[derive(Debug, Clone)]

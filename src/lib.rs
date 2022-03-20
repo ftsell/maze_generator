@@ -9,7 +9,7 @@
     unused_qualifications,
     clippy::unwrap_used,
     clippy::expect_used,
-    clippy::panic,
+    clippy::panic
 )]
 
 //! This is a collection of different maze generation algorithms.
@@ -51,6 +51,7 @@
 #[cfg(test)]
 #[macro_use]
 extern crate quickcheck;
+
 #[cfg(test)]
 #[macro_use]
 mod test_util;
