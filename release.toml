@@ -9,17 +9,14 @@ dev-version-ext = "next"
 tag-name = "v{{version}}"
 tag-message = """Release {{crate_name}} version {{version}}
 
-New features
+** Breaking Changes **
 
-- Added new generator algorithm "Growing Tree"
-- Added new generator algorithm "Prim's Algorithm"
-- Added support for exporting mazes as SVG
-
-Bugfixes
-
-- Fix a bug in the Recursive Backtracking generator where it would only generate an empty maze if the size of the target maze was 1,1. It now properly generates a maze with only one cell.
+- Signature of `::generate(…)` hase been changed.
+  It now returns a `Result` instead of a maze directly. This is a side effect of the fact that all internal calls
+  to `unwrap()`, `expect(…)` or `panic!(…)` have been removed.
+  Instead, those error cases now properly propagate instead of killing the application.
 
 Misc
 
-- Added an example binary that uses this library
+- Clippy lints have been enabled, configured and multiple resulting warnings have been fixed.
 """
