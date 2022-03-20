@@ -18,7 +18,7 @@
 
 ## About the Project
 This is a collection of different maze generation algorithms.
-The project's main goal is to provide an easy-to-use API to different algorithms with different characteristics.  
+The project's main goal is to provide an easy-to-use API to different algorithms with different characteristics.
 
 ## Usage
 See the [crate documentation](https://docs.rs/maze_generator/) for examples.

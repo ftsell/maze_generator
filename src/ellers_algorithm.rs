@@ -17,7 +17,7 @@
 //! If the above explanation seems a bit complex, here's an example for a 4x5 maze:
 //!
 //! 1. First, we initialize each field in the row to be in its own set (represented by numbers):
-//!     
+//!
 //!     ```text
 //!     ·-·-·-·-·-·
 //!     |1|2|3|4|5|
