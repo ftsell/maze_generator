@@ -260,9 +260,9 @@ impl Maze {
 
 // implemented as into and not accessor because after exposing the internal graph, data integrity
 // can not be guaranteed (size, start, goal could be made invalid).
-impl Into<MazeGraph> for Maze {
-    fn into(self) -> MazeGraph {
-        self.graph
+impl From<Maze> for MazeGraph {
+    fn from(m: Maze) -> Self {
+        m.graph
     }
 }
 

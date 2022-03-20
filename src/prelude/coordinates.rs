@@ -35,9 +35,9 @@ impl Coordinates {
     }
 }
 
-impl Into<(i32, i32)> for Coordinates {
-    fn into(self) -> (i32, i32) {
-        (self.x, self.y)
+impl From<Coordinates> for (i32, i32) {
+    fn from(c: Coordinates) -> Self {
+        (c.x, c.y)
     }
 }
 
