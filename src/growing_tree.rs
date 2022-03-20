@@ -47,8 +47,6 @@ impl GrowingTreeGenerator {
     /// Optionally a 32 bit seed can be provided to seed the internal random generator.
     /// Giving a seed results in identical mazes being generated which omitting it sources the
     /// random generator from entropy.
-    ///
-    ///
     pub fn new(seed: Option<[u8; 32]>) -> GrowingTreeGenerator {
         GrowingTreeGenerator {
             rng: match seed {
