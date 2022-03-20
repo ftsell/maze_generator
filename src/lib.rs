@@ -1,6 +1,6 @@
 #![deny(trivial_numeric_casts, trivial_casts, unsafe_code)]
 #![warn(
-    missing_crate_level_docs,
+    rustdoc::missing_crate_level_docs,
     missing_docs,
     missing_debug_implementations,
     missing_copy_implementations,
@@ -55,4 +55,6 @@ mod test_util;
 #[macro_use]
 pub mod prelude;
 pub mod ellers_algorithm;
+pub mod growing_tree;
+pub mod prims_algorithm;
 pub mod recursive_backtracking;
