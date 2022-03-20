@@ -35,8 +35,8 @@ pub enum GrowingTreeSelectionMethod {
 pub struct GrowingTreeGenerator {
     rng: ChaChaRng,
     /// The method by which to select the next candidate cell from the available possibilities
-    pub selectionmethod: GrowingTreeSelectionMethod,
-    cellstack: Vec<Coordinates>,
+    pub selection_method: GrowingTreeSelectionMethod,
+    cell_stack: Vec<Coordinates>,
     visited: Vec<Coordinates>,
     neighbours: Vec<Coordinates>,
 }
@@ -55,8 +55,8 @@ impl GrowingTreeGenerator {
                 None => ChaChaRng::from_entropy(),
                 Some(seed) => ChaChaRng::from_seed(seed),
             },
-            selectionmethod: GrowingTreeSelectionMethod::First,
-            cellstack: Vec::new(),
+            selection_method: GrowingTreeSelectionMethod::First,
+            cell_stack: Vec::new(),
             visited: Vec::new(),
             neighbours: Vec::new(),
         }
@@ -75,37 +75,37 @@ impl GrowingTreeGenerator {
         let mut goal_coordinates = current_coordinates;
         let mut max_q = 0;
 
-        self.cellstack.clear();
-        self.cellstack.push(current_coordinates);
+        self.cell_stack.clear();
+        self.cell_stack.push(current_coordinates);
         self.visited.push(current_coordinates); // Mark it as visited
 
-        while !self.cellstack.is_empty() {
+        while !self.cell_stack.is_empty() {
             self.find_unvisited_neighbours(maze, current_coordinates);
 
             if self.neighbours.is_empty() {
                 // We've reached a dead end - remove the current_coordinates from the stack
-                if self.cellstack.contains(&current_coordinates) {
+                if self.cell_stack.contains(&current_coordinates) {
                     let idx = self
-                        .cellstack
+                        .cell_stack
                         .iter()
                         .position(|&r| r == current_coordinates)
                         .unwrap();
-                    self.cellstack.remove(idx);
+                    self.cell_stack.remove(idx);
                 }
 
                 // If there are no more cells, quit
-                if self.cellstack.is_empty() {
+                if self.cell_stack.is_empty() {
                     continue;
                 }
 
                 // And now select a new current cell according to 'selectionmethod' parameter
                 // pop and remove wont fail because we just tested for non-zero length
-                current_coordinates = match self.selectionmethod {
-                    GrowingTreeSelectionMethod::MostRecent => self.cellstack.pop().unwrap(),
+                current_coordinates = match self.selection_method {
+                    GrowingTreeSelectionMethod::MostRecent => self.cell_stack.pop().unwrap(),
                     GrowingTreeSelectionMethod::Random => {
-                        self.cellstack[self.rng.gen_range(0, self.cellstack.len())]
+                        self.cell_stack[self.rng.gen_range(0, self.cell_stack.len())]
                     }
-                    GrowingTreeSelectionMethod::First => self.cellstack.remove(0),
+                    GrowingTreeSelectionMethod::First => self.cell_stack.remove(0),
                 };
             } else {
                 // We have some neighbours so we can make a passage
@@ -113,13 +113,13 @@ impl GrowingTreeGenerator {
                 // Choose a random neighbouring cell and move to it.
                 let next_coords = self.neighbours[self.rng.gen_range(0, self.neighbours.len())];
                 maze.graph.add_edge(current_coordinates, next_coords, ()); // Knock down the wall between them
-                self.cellstack.push(next_coords);
+                self.cell_stack.push(next_coords);
                 current_coordinates = next_coords;
                 self.visited.push(current_coordinates); // Mark the new cell as visited
 
                 // Keep track of the longest cell stack. Our target is at the end of this stack - the neighbour to which we just connected
-                if self.cellstack.len() > max_q {
-                    max_q = self.cellstack.len();
+                if self.cell_stack.len() > max_q {
+                    max_q = self.cell_stack.len();
                     goal_coordinates = current_coordinates;
                 }
             }

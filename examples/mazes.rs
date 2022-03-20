@@ -122,7 +122,7 @@ fn main() {
         "gt" | "growing" | "growingtree" => {
             actualtype = String::from("Growing tree");
             let mut generator = GrowingTreeGenerator::new(rngseed);
-            generator.selectionmethod = match selectionmethod {
+            generator.selection_method = match selectionmethod {
                 1 => GrowingTreeSelectionMethod::MostRecent,
                 2 => GrowingTreeSelectionMethod::Random,
                 _ => GrowingTreeSelectionMethod::First,
