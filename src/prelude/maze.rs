@@ -45,7 +45,7 @@ impl Maze {
                     self.graph
                         .contains_edge(*coordinates, coordinates.next(dir))
                 })
-                .map(|dir| *dir)
+                .copied()
                 .collect();
 
             let field_type = if &self.start == coordinates {
