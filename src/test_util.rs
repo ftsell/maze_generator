@@ -73,8 +73,8 @@ pub(crate) fn test_route_from_start_to_goal_exists(
     match generate_maze(&mut gen, width, height) {
         None => TestResult::discard(),
         Some(maze) => {
-            let start = maze.start.clone();
-            let goal = maze.goal.clone();
+            let start = maze.start;
+            let goal = maze.goal;
 
             if start == goal && width == 1 && height == 1 {
                 return TestResult::passed(); // degenerate example: single cell maze

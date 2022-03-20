@@ -43,9 +43,9 @@ impl Maze {
                 .iter()
                 .filter(|dir| {
                     self.graph
-                        .contains_edge(coordinates.clone(), coordinates.next(dir))
+                        .contains_edge(*coordinates, coordinates.next(dir))
                 })
-                .map(|dir| dir.clone())
+                .map(|dir| *dir)
                 .collect();
 
             let field_type = if &self.start == coordinates {
@@ -56,7 +56,7 @@ impl Maze {
                 FieldType::Normal
             };
 
-            Some(Field::new(field_type, coordinates.clone(), passages))
+            Some(Field::new(field_type, *coordinates, passages))
         } else {
             None
         }
