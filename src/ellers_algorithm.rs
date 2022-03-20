@@ -149,10 +149,12 @@
 //! [Jamis Buck's Buckblog](http://weblog.jamisbuck.org/2010/12/29/maze-generation-eller-s-algorithm.html)*
 //!
 
-use crate::prelude::*;
+use std::collections::{BTreeSet, HashSet, VecDeque};
+
 use rand::prelude::*;
 use rand_chacha::ChaChaRng;
-use std::collections::{BTreeSet, HashSet, VecDeque};
+
+use crate::prelude::*;
 
 const HORIZONTAL_JOIN_CHANCE: f64 = 0.5;
 
@@ -245,7 +247,7 @@ impl EllersGenerator {
                     i_set.iter().filter(|c| c.y == current_y).cloned().collect();
 
                 // how many downward connections should be added
-                let count = if bottom_most_fields.len() >= 1 {
+                let count = if !bottom_most_fields.is_empty() {
                     1
                 } else {
                     self.rng.gen_range(1, bottom_most_fields.len())
@@ -267,11 +269,10 @@ impl EllersGenerator {
         for i_x in 0..self.sets.len() {
             let coordinates = (i_x as i32, next_y).into();
 
-            if self
+            if !self
                 .sets
                 .iter()
-                .find(|set| set.contains(&coordinates))
-                .is_none()
+                .any(|set| set.contains(&coordinates))
             {
                 self.sets
                     .iter_mut()
