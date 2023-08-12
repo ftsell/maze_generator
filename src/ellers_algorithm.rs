@@ -353,7 +353,7 @@ impl Generator for EllersGenerator {
         self.graph = MazeGraph::with_capacity((width * height) as usize, 0);
 
         self.init_fields_first_row(width);
-        for y in 0..height {
+        for y in 0..(height - 1) {
             self.randomly_join_fields(y)
                 .with_context(|| "Could not generate maze")?;
             self.create_downward_connections(y);
