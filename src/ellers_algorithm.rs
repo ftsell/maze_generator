@@ -376,8 +376,33 @@ impl Generator for EllersGenerator {
 
 #[cfg(test)]
 mod test {
+    use crate::prelude::{Coordinates, Direction, Generator};
+
+    use super::EllersGenerator;
+
     test_all_coordinates_have_fields!(super::EllersGenerator);
     test_route_from_start_to_goal_exists!(super::EllersGenerator);
     test_all_fields_connected!(super::EllersGenerator);
     test_generation_is_deterministic!(super::EllersGenerator);
+
+    #[test]
+    fn test_south_passage() -> anyhow::Result<()> {
+        let mut generator = EllersGenerator::new(Some([1; 32]));
+        let maze = generator.generate(3, 3)?;
+        let (width, height) = maze.size;
+
+        println!("{maze:?}");
+
+        for i in 0..width {
+            if let Some(field) = maze.get_field(&Coordinates::new(i, height - 1)) {
+                assert!(
+                    !field.has_passage(&Direction::South),
+                    "South passage at ({i}, {})",
+                    height - 1
+                );
+            }
+        }
+
+        Ok(())
+    }
 }
